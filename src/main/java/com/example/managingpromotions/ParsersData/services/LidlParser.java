@@ -16,7 +16,7 @@ public class LidlParser implements IParser {
 
     //todo you should add String url parameter in fetch dataFromWeb
     @Override
-    public Document fetchDataFromWeb() {
+    public Document fetchDataFromWeb(String URL) {
         final String urlAdress = "https://www.lidl.pl/pl/c/wtorek/c4019/w2";
 
         try {
@@ -28,9 +28,10 @@ public class LidlParser implements IParser {
         return null;
     }
 
+    //todo change parameter in fetch data from web
     @Override
     public List<ProductDTO> prepareData() {
-        Document document = fetchDataFromWeb();
+        Document document = fetchDataFromWeb("//todo");
         List<ProductDTO> listProducts = new ArrayList<>();
 
         if(document!=null){
@@ -41,8 +42,12 @@ public class LidlParser implements IParser {
                 product.setProductName(row.attr("data-name"));
                 product.setPrice(Double.parseDouble(row.attr("data-price").replace(",", ".")));
                 product.setDescription(row.attr("data-list"));
+
+                String links = row.select("source").attr("data-srcset");
+                String link = links.substring(0, links.indexOf(","));
+                product.setLinkToImage(link);
+
                 listProducts.add(product);
-                System.out.println(row.attr("data-name"));
             }
         }
         return listProducts;

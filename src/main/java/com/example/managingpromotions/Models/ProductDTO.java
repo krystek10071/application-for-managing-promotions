@@ -15,4 +15,5 @@ public class ProductDTO {
     private double price;
     private String category;
     private Date expiryData;
+    private String linkToImage;
 }

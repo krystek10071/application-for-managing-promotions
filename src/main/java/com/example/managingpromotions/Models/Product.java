@@ -24,4 +24,7 @@ public class Product{
 
     @Column(name="EXPIRY_DATE")
     private Date expiryDate;
+
+    @Column(name ="LINK_TO_IMAGE")
+    private String linkToImage;
 }

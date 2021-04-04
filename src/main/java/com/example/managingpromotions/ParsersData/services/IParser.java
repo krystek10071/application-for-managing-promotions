@@ -6,6 +6,6 @@ import org.jsoup.nodes.Document;
 import java.util.List;
 
 public interface IParser {
-    Document fetchDataFromWeb();
+    Document fetchDataFromWeb(String URL);
     List<ProductDTO> prepareData();
 }
