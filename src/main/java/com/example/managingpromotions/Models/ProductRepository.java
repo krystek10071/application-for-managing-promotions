@@ -1,4 +1,4 @@
-package Models;
+package com.example.managingpromotions.Models;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
