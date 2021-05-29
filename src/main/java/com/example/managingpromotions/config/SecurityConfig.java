@@ -1,16 +1,18 @@
 package com.example.managingpromotions.config;
 
+import com.example.managingpromotions.models.repository.UserRepository;
+import com.example.managingpromotions.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 import javax.sql.DataSource;
@@ -23,21 +25,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final RestAuthenticationFailureHandler authenticationFailureHandler;
     private final String secret;
     private final DataSource dataSource;
+    private UserRepository userRepository;
 
-    public SecurityConfig(RestAuthenticationSuccessHandler authenticationSuccessHandler, RestAuthenticationFailureHandler authenticationFailureHandler, @Value("${jwt.secret}") String secret, DataSource dataSource) {
+    public SecurityConfig(RestAuthenticationSuccessHandler authenticationSuccessHandler, RestAuthenticationFailureHandler authenticationFailureHandler, @Value("${jwt.secret}") String secret, DataSource dataSource, UserRepository userRepository) {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.secret = secret;
         this.dataSource = dataSource;
+        this.userRepository = userRepository;
     }
 
 
     @Bean
     public JsonObjectAuthenticationFilter authenticationFilter() throws Exception{
         JsonObjectAuthenticationFilter filter = new JsonObjectAuthenticationFilter();
-        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler); // 1
-        filter.setAuthenticationFailureHandler(authenticationFailureHandler); // 2
-        filter.setAuthenticationManager(super.authenticationManager()); // 3
+        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+        filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        filter.setAuthenticationManager(super.authenticationManager());
         return filter;
     }
 
@@ -56,25 +60,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(authenticationFilter())
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsManager(), secret))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), new UserDetailsServiceImpl(userRepository) , secret))
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and()
                 .headers().frameOptions().disable();;
     }
 
-    @Bean
-    public UserDetailsManager userDetailsManager(){
-        return new JdbcUserDetailsManager(dataSource);
+       @Bean
+    public UserDetailsService userDetailsService(){
+        return new UserDetailsServiceImpl(userRepository);
     }
 
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+
+        return authProvider;
+    }
+
+
     @Override
-    protected  void configure(AuthenticationManagerBuilder builder) throws Exception{
-        builder.jdbcAuthentication()
-                .dataSource(dataSource);
-               // .withUser("kris")
-               // .password("{noop}pass")
-               // .roles("USER");
+    protected  void configure(AuthenticationManagerBuilder builder) {
+        builder.authenticationProvider(authenticationProvider());
     }
 
 }
