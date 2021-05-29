@@ -1,4 +1,4 @@
-package com.example.managingpromotions.Models;
+package com.example.managingpromotions.models;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

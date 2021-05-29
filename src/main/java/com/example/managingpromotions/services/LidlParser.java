@@ -1,6 +1,6 @@
-package com.example.managingpromotions.ParsersData.services;
+package com.example.managingpromotions.services;
 
-import com.example.managingpromotions.Models.ProductDTO;
+import com.example.managingpromotions.models.ProductDTO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

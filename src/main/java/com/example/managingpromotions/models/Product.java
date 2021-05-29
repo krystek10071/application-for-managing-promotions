@@ -1,4 +1,4 @@
-package com.example.managingpromotions.Models;
+package com.example.managingpromotions.models;
 
 import javax.persistence.*;
 import java.util.Date;
