@@ -17,7 +17,7 @@ public class LidlParser implements IParser {
     //todo you should add String url parameter in fetch dataFromWeb
     @Override
     public Document fetchDataFromWeb(String URL) {
-        final String urlAdress = "https://www.lidl.pl/pl/c/wtorek/c4019/w2";
+        final String urlAdress = "https://www.lidl.pl/c/czwartek/c4133/w1";
 
         try {
             return Jsoup.connect(urlAdress).maxBodySize(0).get();
@@ -31,7 +31,7 @@ public class LidlParser implements IParser {
     //todo change parameter in fetch data from web
     @Override
     public List<ProductDTO> prepareData() {
-        Document document = fetchDataFromWeb("//todo");
+        Document document = fetchDataFromWeb("https://www.lidl.pl/c/czwartek/c4133/w1");
         List<ProductDTO> listProducts = new ArrayList<>();
 
         if(document!=null){

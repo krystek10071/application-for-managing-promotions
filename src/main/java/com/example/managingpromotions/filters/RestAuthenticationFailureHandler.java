@@ -1,4 +1,4 @@
-package com.example.managingpromotions.config;
+package com.example.managingpromotions.filters;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;

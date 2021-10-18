@@ -16,6 +16,7 @@ public class ParserManageController {
     }
 
     public void parse() {
-        ladyBirdService.prepareData();
+        //ladyBirdService.prepareData();
+        parserService.prepareData();
     }
 }

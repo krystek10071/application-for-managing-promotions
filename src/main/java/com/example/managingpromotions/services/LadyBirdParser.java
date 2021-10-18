@@ -16,7 +16,7 @@ public class LadyBirdParser implements IParser{
 
     @Override
     public Document fetchDataFromWeb(String URL) {
-        final String urlAdress = "https://www.biedronka.pl/pl/w-tym-tyg-06-04";
+         final String urlAdress = "https://www.biedronka.pl/pl/w-tym-tyg-27-05";
 
         try {
             return Jsoup.connect(urlAdress).maxBodySize(0).get();
@@ -29,7 +29,7 @@ public class LadyBirdParser implements IParser{
 
     @Override
     public List<ProductDTO> prepareData() {
-        Document document = fetchDataFromWeb("//todo");
+        Document document = fetchDataFromWeb("https://www.biedronka.pl/pl/w-tym-tyg-27-05");
         List<ProductDTO> listProducts = new ArrayList<>();
 
         if(document!=null){
@@ -39,7 +39,7 @@ public class LadyBirdParser implements IParser{
 
             for(Element row: rows){
                 ProductDTO product = new ProductDTO();
-             //   product.setProductName(row.attr();
+                //  product.setProductName(row.attr();
               //  product.setPrice(row.text());
                 System.out.println(row.text());
               //  System.out.println(product.getProductName());

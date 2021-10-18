@@ -1,4 +1,4 @@
-package com.example.managingpromotions.config;
+package com.example.managingpromotions.models;
 
 public class LoginCredentials {
     private String username;

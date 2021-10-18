@@ -1,4 +1,4 @@
-package com.example.managingpromotions.config;
+package com.example.managingpromotions.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

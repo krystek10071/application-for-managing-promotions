@@ -1,5 +1,6 @@
-package com.example.managingpromotions.config;
+package com.example.managingpromotions.filters;
 
+import com.example.managingpromotions.models.LoginCredentials;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
