@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: managingPromotions
+  description: managingPromotionsApplications
+paths:
+  /health:
+    get:
+      description: This is healt description
+      operationId: GetHealtMsg
+      tags:
+        - Health
+      responses:
+        "200":
+          description : Applications is alive
+
+components:
+  schemas:
+    EmployeeDTO:
+      type: object
+      properties:
+        employeeCode:
+          type: string

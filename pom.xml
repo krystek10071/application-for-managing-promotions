@@ -15,6 +15,7 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>15</java.version>
+		<environment>local</environment>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -35,8 +36,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.2.21</version>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -81,6 +83,36 @@
 			<version>2.9.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>openapi-generator-maven-plugin</artifactId>
+			<version>5.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.5.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>4.3.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>1.4.2.Final</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -95,6 +127,55 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+					<groupId>org.openapitools</groupId>
+					<artifactId>openapi-generator-maven-plugin</artifactId>
+					<version>5.1.1</version>
+					<executions>
+						<execution>
+							<id>1</id>
+							<goals>
+								<goal>generate</goal>
+							</goals>
+							<configuration>
+								<inputSpec>${project.basedir}/src/main/resources/contract/v1.yaml</inputSpec>
+								<generatorName>spring</generatorName>
+								<modelPackage>pl.managingPromotions.api.model</modelPackage>
+								<generateApis>false</generateApis>
+								<generateModels>true</generateModels>
+								<generateModelTests>false</generateModelTests>
+								<generateModelDocumentation>false</generateModelDocumentation>
+								<generateSupportingFiles>false</generateSupportingFiles>
+								<addCompileSourceRoot>true</addCompileSourceRoot>
+								<configOptions>
+									<hideGenerationTimestamp>true</hideGenerationTimestamp>
+									<!--suppress UnresolvedMavenProperty -->
+									<additionalModelTypeAnnotations>@lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor</additionalModelTypeAnnotations>
+									<dateLibrary>java15</dateLibrary>
+								</configOptions>
+								<typeMappings>
+									<typeMapping>OffsetDateTime=LocalDateTime</typeMapping>
+								</typeMappings>
+								<importMappings>
+									<importMapping>java.time.OffsetDateTime=java.time.LocalDateTime</importMapping>
+								</importMappings>
+								<library>spring-boot</library>
+							</configuration>
+						</execution>
+					</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>4.3.5</version>
+				<configuration>
+					<propertyFile>src/main/resources/liquibase/${environment}.liquibase.properties</propertyFile>
+					<changeLogFile>src/main/resources/liquibase/changelog/changelog-master.xml</changeLogFile>
+					<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
 				</configuration>
 			</plugin>
 		</plugins>
