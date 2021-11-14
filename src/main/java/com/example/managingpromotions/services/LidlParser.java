@@ -14,13 +14,11 @@ import java.util.List;
 @Service("lidlParser")
 public class LidlParser implements IParser {
 
-    //todo you should add String url parameter in fetch dataFromWeb
     @Override
     public Document fetchDataFromWeb(String URL) {
-        final String urlAdress = "https://www.lidl.pl/c/czwartek/c4133/w1";
 
         try {
-            return Jsoup.connect(urlAdress).maxBodySize(0).get();
+            return Jsoup.connect(URL).maxBodySize(0).get();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("resource failed to fetch from LIDL");
@@ -28,28 +26,55 @@ public class LidlParser implements IParser {
         return null;
     }
 
-    //todo change parameter in fetch data from web
     @Override
-    public List<ProductDTO> prepareData() {
-        Document document = fetchDataFromWeb("https://www.lidl.pl/c/czwartek/c4133/w1");
+    public List<ProductDTO> prepareData(String shopName) {
         List<ProductDTO> listProducts = new ArrayList<>();
+        Document document = fetchDataFromWeb("https://ding.pl/oferty?contractors[]=130-Lidl&categories[]=4-Spo%C5%BCywcze");
 
-        if(document!=null){
-            Elements rows = document.select("#pageMain > div > div > section > div > div > div[data-currency = zł]");
+        if (document != null) {
+            //display document
+            Elements elementsPromotionsFromLidl = document.select("section._1q38i8t:nth-child(3) > div > div > div > div > div" );
+            System.out.println("Elements size is: " + elementsPromotionsFromLidl.size());
 
-            for(Element row: rows){
-                ProductDTO product = new ProductDTO();
-                product.setProductName(row.attr("data-name"));
-                product.setPrice(Double.parseDouble(row.attr("data-price").replace(",", ".")));
-                product.setDescription(row.attr("data-list"));
+            for (Element row : elementsPromotionsFromLidl) {
+               ProductDTO product = new ProductDTO();
 
-                String links = row.select("source").attr("data-srcset");
-                String link = links.substring(0, links.indexOf(","));
-                product.setLinkToImage(link);
+               product.setProductName(findProductNameInHTML(row));
+               product.setDescription("");
+               product.setPrice(Double.parseDouble(findPrice(row)));
+
 
                 listProducts.add(product);
             }
         }
         return listProducts;
+    }
+
+    private String findProductNameInHTML(Element row) {
+        Elements elementWithoutTextOfChildren = row.select("div._15inhnc");
+        return elementWithoutTextOfChildren.first().ownText();
+    }
+
+    private String findDescription(Element row){
+        return "";
+    }
+
+    private String findPrice(Element row){
+        Elements elementsWithPriceBeforeDecimalPoint = row.select("span._1423ztp");
+        Elements elementsWithPriceAfterDecimalPoint = row.select("sup");
+
+        String valuePriceBeforePoint = elementsWithPriceBeforeDecimalPoint.first().ownText();
+        String valuePriceAfterPoint = elementsWithPriceAfterDecimalPoint.first().ownText();
+
+        return valuePriceBeforePoint + "." + valuePriceAfterPoint;
+    }
+
+    private String findCategory(Element row){
+        return "";
+    }
+
+    private String findExpiryDate(Element row){
+        Elements elementWithExpiryDate = row.select("span._wdbkny-7");
+        return elementWithExpiryDate.first().ownText();
     }
 }
