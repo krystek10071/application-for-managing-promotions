@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -12,7 +13,7 @@ import java.util.Date;
 public class ProductDTO {
     private String productName;
     private String description;
-    private double price;
+    private BigDecimal price;
     private String category;
     private Date expiryData;
     private String linkToImage;

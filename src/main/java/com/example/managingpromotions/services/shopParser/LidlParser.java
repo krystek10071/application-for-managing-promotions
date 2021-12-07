@@ -1,6 +1,7 @@
-package com.example.managingpromotions.services;
+package com.example.managingpromotions.services.shopParser;
 
 import com.example.managingpromotions.models.ProductDTO;
+import com.example.managingpromotions.services.shopParser.IParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,15 +34,16 @@ public class LidlParser implements IParser {
 
         if (document != null) {
             //display document
-            Elements elementsPromotionsFromLidl = document.select("section._1q38i8t:nth-child(3) > div > div > div > div > div" );
+            Elements elementsPromotionsFromLidl = document.select("html" );
             System.out.println("Elements size is: " + elementsPromotionsFromLidl.size());
 
             for (Element row : elementsPromotionsFromLidl) {
                ProductDTO product = new ProductDTO();
+             /*   System.out.println(row);*/
 
                product.setProductName(findProductNameInHTML(row));
                product.setDescription("");
-               product.setPrice(Double.parseDouble(findPrice(row)));
+           /*    product.setPrice(Double.parseDouble(findPrice(row)));*/
 
 
                 listProducts.add(product);

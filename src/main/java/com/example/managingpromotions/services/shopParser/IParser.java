@@ -1,4 +1,4 @@
-package com.example.managingpromotions.services;
+package com.example.managingpromotions.services.shopParser;
 
 import com.example.managingpromotions.models.ProductDTO;
 import org.jsoup.nodes.Document;
