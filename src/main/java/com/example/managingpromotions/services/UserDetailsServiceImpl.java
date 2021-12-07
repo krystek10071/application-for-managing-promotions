@@ -3,7 +3,6 @@ package com.example.managingpromotions.services;
 import com.example.managingpromotions.models.User;
 import com.example.managingpromotions.models.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
