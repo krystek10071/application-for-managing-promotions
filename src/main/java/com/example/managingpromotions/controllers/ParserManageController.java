@@ -9,14 +9,19 @@ public class ParserManageController {
 
     private final IParser parserService;
     private final IParser auchanParser;
+    private final IParser carrefourParser;
 
-    public ParserManageController(@Qualifier("lidlParser") IParser parserService, @Qualifier("auchanService") IParser auchanParser) {
+    public ParserManageController(@Qualifier("lidlParser") IParser parserService,
+                                  @Qualifier("auchanService") IParser auchanParser,
+                                  @Qualifier("carrefourParser") IParser carrefourParser) {
         this.parserService = parserService;
         this.auchanParser = auchanParser;
+        this.carrefourParser = carrefourParser;
     }
 
     public void parse() {
-        parserService.prepareData("Lidl");
+      /*  parserService.prepareData("Lidl");*/
         auchanParser.prepareData("Auchan");
+        carrefourParser.prepareData("Carrefour");
     }
 }
