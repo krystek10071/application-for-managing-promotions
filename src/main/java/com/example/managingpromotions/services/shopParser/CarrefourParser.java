@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -21,45 +20,34 @@ import java.util.List;
 @AllArgsConstructor
 public class CarrefourParser implements IParser {
 
-    private static final String URL_SHOP =  "https://www.carrefour.pl/szukaj?q=mleko";
+    private static final String URL_SHOP = "https://www.carrefour.pl/szukaj?page=0&size=10&q=";
 
     private final WebDriver webDriver;
 
     @Override
-    public Document fetchDataFromWeb(String URL) {
-        setPropertySeleniumDriver();
-
-        //todo implements
-        return null;
+    public Document fetchDataFromWeb(String nameProduct) {
+        String carrefourProductUrl = URL_SHOP + nameProduct;
+        return fetchDataByWebDriver(carrefourProductUrl);
     }
 
     @Override
-    public List<ProductDTO> prepareData(String shopName) {
+    public List<ProductDTO> prepareData(Document document) {
         List<ProductDTO> productDTOList = new ArrayList<>();
 
-        Document document =  fetchDataByWebDriver(webDriver);
-
-        //print document
-        System.out.println(document);
-
-        if(document != null) {
-            //display document
-            Elements elementsPromotionsFromCarrefour =  document.select(".jss277");
-
-            for(var row : elementsPromotionsFromCarrefour){
+        if (document != null) {
+            Elements elementsPromotionsFromCarrefour = document.select(" #__next > div > div.MuiBox-root.jss206 > div > div > div > div.jss76 > div > div > div");
+            for (var row : elementsPromotionsFromCarrefour) {
                 ProductDTO product = new ProductDTO();
-                
+
                 product.setProductName(findProductNameInDocument(row));
                 product.setPrice(new BigDecimal(findPriceProduct(row)));
                 product.setDescription(findProductDescription(row));
                 product.setLinkToImage(findLinkToImage(row));
 
-                System.out.println(" ");
-                System.out.println(row);
+                productDTOList.add(product);
             }
         }
-
-        return Collections.emptyList();
+        return productDTOList;
     }
 
     private String findProductNameInDocument(Element row) {
@@ -67,7 +55,7 @@ public class CarrefourParser implements IParser {
     }
 
     private String findPriceProduct(Element row) {
-        String price  = row.select("div.MuiTypography-root").text();
+        String price = row.select("div.MuiTypography-root").text();
 
         return Arrays.stream(price.split(" ")).findFirst().get().replace(",", ".");
     }
@@ -77,16 +65,16 @@ public class CarrefourParser implements IParser {
     }
 
     private String findLinkToImage(Element row) {
-        return row.select("img").text();
+        return row.select("div.lazyload-wrapper").text();
     }
 
 
-    private void setPropertySeleniumDriver() {
-        System.setProperty("webdriver.gecko.driver", "D:\\Praca dyplomowa KUL\\managing-promotions\\src\\main\\resources\\webdriver\\geckodriver.exe");
-    }
-
-    private Document fetchDataByWebDriver(WebDriver webDriver) {
-        webDriver.get(URL_SHOP);
+    private Document fetchDataByWebDriver(String url) {
+        webDriver.get(url);
         return Jsoup.parse(webDriver.getPageSource());
+    }
+
+    private String prepareUrl(String nameProduct){
+        return URL_SHOP + nameProduct;
     }
 }
