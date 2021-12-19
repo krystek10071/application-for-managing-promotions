@@ -10,48 +10,35 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 @Service("auchanService")
 @AllArgsConstructor
 public class AuchanParser implements IParser {
-    private static final String URL_SHOP = "https://zakupy.auchan.pl/shop/search?q%5B%5D=mleko&qq=%7B%7D";
+    private static final String URL_SHOP_PREFIX = "https://zakupy.auchan.pl/shop/search?q%5B%5D=";
+    private static final String URL_SHOP_POSTFIX = "&qq=%7B%7D";
 
     private final WebDriver webDriver;
 
     @Override
-    public Document fetchDataFromWeb(String URL) {
-        try {
-            return Jsoup.connect(URL).maxBodySize(0).get();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("resource failed to fetch from Daisy");
-        }
-        return null;
+    public Document fetchDataFromWeb(String nameProduct) {
+        String auchanProductUrl = URL_SHOP_PREFIX + nameProduct + URL_SHOP_POSTFIX;
+        return fetchDataByWebDriver(auchanProductUrl);
     }
 
     @Override
-    public List<ProductDTO> prepareData(String shopName) {
-        List<ProductDTO> listProducts = new ArrayList<>();
-        System.setProperty("webdriver.gecko.driver", "D:\\Praca dyplomowa KUL\\managing-promotions\\src\\main\\resources\\webdriver\\geckodriver.exe");
-
-        webDriver.get(URL_SHOP);
-        Document document = Jsoup.parse(webDriver.getPageSource());
-
-        //print document
-        System.out.println(document);
+    public List<ProductDTO> prepareData(Document document) {
+        List<ProductDTO> listProductDTO = new ArrayList<>();
 
         if (document != null) {
             //display document
             Elements elementsPromotionsFromAuchan = document.select("._2XHV > div:nth-child(1) > div:nth-child(1) > div");
 
-            for(var row : elementsPromotionsFromAuchan){
+            for (var row : elementsPromotionsFromAuchan) {
                 ProductDTO product = new ProductDTO();
 
                 product.setProductName(findProductNameInDocument(row));
@@ -59,11 +46,15 @@ public class AuchanParser implements IParser {
                 product.setDescription(findProductDescription(row));
                 product.setLinkToImage(findLinkToImage(row));
 
-                System.out.println(" ");
-                System.out.println(row);
+                listProductDTO.add(product);
             }
         }
-        return Collections.emptyList();
+        return listProductDTO;
+    }
+
+    private Document fetchDataByWebDriver(String auchanProductUrl) {
+        webDriver.get(auchanProductUrl);
+        return Jsoup.parse(webDriver.getPageSource());
     }
 
     private String findProductNameInDocument(Element row) {
@@ -75,7 +66,10 @@ public class AuchanParser implements IParser {
 
         String price = elements.text();
 
-        return Arrays.stream(price.split(" ")).findFirst().get().replace(",", ".");
+        return Arrays.stream(price.split(" "))
+                .findFirst()
+                .get()
+                .replace(",", ".");
     }
 
     private String findProductDescription(Element row) {

@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Bean
-    public JsonObjectAuthenticationFilter authenticationFilter() throws Exception{
+    public JsonObjectAuthenticationFilter authenticationFilter() throws Exception {
         JsonObjectAuthenticationFilter filter = new JsonObjectAuthenticationFilter();
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
@@ -50,11 +50,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception{
+    protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/**").permitAll()
                 .antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
                 .antMatchers("/webjars/**").permitAll()
@@ -64,30 +64,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(authenticationFilter())
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), new UserDetailsServiceImpl(userRepository) , secret))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), new UserDetailsServiceImpl(userRepository), secret))
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and()
-                .headers().frameOptions().disable();;
+                .headers().frameOptions().disable();
+        ;
     }
 
-       @Bean
-    public UserDetailsService userDetailsService(){
+    @Bean
+    public UserDetailsService userDetailsService() {
         return new UserDetailsServiceImpl(userRepository);
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(){
+    public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
 
         return authProvider;
     }
 
-
     @Override
-    protected  void configure(AuthenticationManagerBuilder builder) {
+    protected void configure(AuthenticationManagerBuilder builder) {
         builder.authenticationProvider(authenticationProvider());
     }
-
 }
