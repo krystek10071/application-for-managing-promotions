@@ -1,6 +1,5 @@
 package com.example.managingpromotions.controllers.shop;
 
-import com.example.managingpromotions.models.ProductDTO;
 import com.example.managingpromotions.services.shopParser.AuchanParser;
 import com.example.managingpromotions.services.shopParser.CarrefourParser;
 import com.example.managingpromotions.services.shopParser.EleclercParser;
@@ -10,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.managingPromotions.api.model.ProductDTO;
 
 import java.util.List;
 

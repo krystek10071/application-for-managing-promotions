@@ -1,6 +1,5 @@
 package com.example.managingpromotions.services.shopParser;
 
-import com.example.managingpromotions.models.ProductDTO;
 import lombok.AllArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -8,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
+import pl.managingPromotions.api.model.ProductDTO;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

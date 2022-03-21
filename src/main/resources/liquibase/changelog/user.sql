@@ -4,6 +4,7 @@ CREATE TABLE users
     username                    VARCHAR(50)                 NOT NULL,
     password                    VARCHAR(50)                 NOT NULL,
     enabled                     BOOLEAN                     NOT NULL,
+    role                        VARCHAR(10)                 NOT NULL,
 
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );

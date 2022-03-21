@@ -1,6 +1,5 @@
 package com.example.managingpromotions.services.shopParser;
 
-import com.example.managingpromotions.models.ProductDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -9,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
+import pl.managingPromotions.api.model.ProductDTO;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class CarrefourParser implements IParser {
                 product.setProductName(findProductNameInDocument(row));
                 product.setPrice(new BigDecimal(findPriceProduct(row)));
                 product.setDescription(findProductDescription(row));
-                product.setLinkToImage(findLinkToImage(row));
+                //   product.setLinkToImage(findLinkToImage(row));
 
                 productDTOList.add(product);
             }
@@ -74,7 +74,7 @@ public class CarrefourParser implements IParser {
         return Jsoup.parse(webDriver.getPageSource());
     }
 
-    private String prepareUrl(String nameProduct){
+    private String prepareUrl(String nameProduct) {
         return URL_SHOP + nameProduct;
     }
 }

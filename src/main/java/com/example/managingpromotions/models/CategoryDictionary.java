@@ -6,17 +6,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "authorities")
-public class Authorities {
+@AllArgsConstructor
+@Table(name = "categoryDictionary")
+public class CategoryDictionary {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
-    private String authority;
+
+    @Column(name = "name")
+    private String name;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            mappedBy = "categoryDictionary")
+    private Set<Product> products;
 }

@@ -13,8 +13,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "recipes")
+public class Recipe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_user")
@@ -25,24 +25,17 @@ public class User {
     )
     private Long id;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "description")
+    private String description;
 
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "enabled")
-    private boolean isEnabled;
+    @Column(name = "quantity")
+    private Long quantity;
 
     @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<Recipe> recipes;
+            mappedBy = "recipe")
+    private List<Ingredient> ingredients;
 
-    @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<GroceryList> groceryLists;
-
-    @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<FavouriteProduct> favouriteProducts;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 }
