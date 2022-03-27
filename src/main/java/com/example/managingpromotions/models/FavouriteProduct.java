@@ -12,14 +12,14 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "favourite_products")
+@Table(name = "favourite_product")
 public class FavouriteProduct {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_favourite_products")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_favourite_product")
     @SequenceGenerator(
-            name = "seq_favourite_products",
-            sequenceName = "seq_favourite_products",
+            name = "seq_favourite_product",
+            sequenceName = "seq_favourite_product",
             allocationSize = 1
     )
     private Long id;
@@ -32,6 +32,6 @@ public class FavouriteProduct {
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @JoinColumn(name = "user_app_id", referencedColumnName = "id")
+    private UserApp userApp;
 }

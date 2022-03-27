@@ -17,9 +17,13 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "product")
 public class Product {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "grocery_list")
+    @SequenceGenerator(
+            name = "seq_product",
+            sequenceName = "seq_product",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "product_name")

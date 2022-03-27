@@ -1,3 +1,4 @@
+/*
 package com.example.managingpromotions.models;
 
 import lombok.AllArgsConstructor;
@@ -20,3 +21,4 @@ public class Authorities {
     private String username;
     private String authority;
 }
+*/

@@ -17,7 +17,12 @@ import java.util.Set;
 public class CategoryDictionary {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_category_dictionary")
+    @SequenceGenerator(
+            name = "seq_category_dictionary",
+            sequenceName = "seq_category_dictionary",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "name")

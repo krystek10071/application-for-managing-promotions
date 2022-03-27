@@ -6,21 +6,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "user_app")
+public class UserApp {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_user")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_user_app")
     @SequenceGenerator(
-            name = "seq_user",
-            sequenceName = "seq_user",
+            name = "seq_user_app",
+            sequenceName = "seq_user_app",
             allocationSize = 1
     )
     private Long id;
@@ -35,14 +35,10 @@ public class User {
     private boolean isEnabled;
 
     @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<Recipe> recipes;
+            mappedBy = "userApp")
+    private Set<GroceryList> groceryLists;
 
     @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<GroceryList> groceryLists;
-
-    @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "user")
-    private List<FavouriteProduct> favouriteProducts;
+            mappedBy = "userApp")
+    private Set<FavouriteProduct> favouriteProducts;
 }

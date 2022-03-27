@@ -13,7 +13,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "shops")
+@Table(name = "shop")
 public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_shops")

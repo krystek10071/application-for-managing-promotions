@@ -1,6 +1,6 @@
 package com.example.managingpromotions.services;
 
-import com.example.managingpromotions.models.User;
+import com.example.managingpromotions.models.UserApp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -13,10 +13,10 @@ public class UserDetailsImpl implements UserDetails {
     private String password;
     private boolean enabled;
 
-    public UserDetailsImpl(User user) {
-        this.username = user.getUsername();
-        this.password = user.getPassword();
-        this.enabled = user.isEnabled();
+    public UserDetailsImpl(UserApp userApp) {
+        this.username = userApp.getUsername();
+        this.password = userApp.getPassword();
+        this.enabled = userApp.isEnabled();
     }
 
     public UserDetailsImpl() {}

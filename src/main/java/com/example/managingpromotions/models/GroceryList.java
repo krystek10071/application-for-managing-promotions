@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -16,10 +18,10 @@ import javax.persistence.*;
 public class GroceryList {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "grocery_list")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_grocery_list")
     @SequenceGenerator(
-            name = "grocery_list",
-            sequenceName = "grocery_list",
+            name = "seq_grocery_list",
+            sequenceName = "seq_grocery_list",
             allocationSize = 1
     )
     private Long id;
@@ -27,13 +29,17 @@ public class GroceryList {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "unit")
-    private String unit;
+    @Column(name = "createDate")
+    private LocalDate createDate;
 
-    @Column(name = "amount")
-    private Double amount;
+    @Column(name = "modifyDate")
+    private LocalDate modifyDate;
+
+    @OneToMany(cascade = CascadeType.ALL,
+    mappedBy = "groceryList")
+    private Set<GroceryElement> groceryElements;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    private UserApp userApp;
 }

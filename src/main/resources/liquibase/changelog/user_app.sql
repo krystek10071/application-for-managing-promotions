@@ -1,4 +1,4 @@
-CREATE TABLE users
+CREATE TABLE user_app
 (
     id                          BIGINT                      NOT NULL,
     username                    VARCHAR(50)                 NOT NULL,
@@ -6,9 +6,9 @@ CREATE TABLE users
     enabled                     BOOLEAN                     NOT NULL,
     role                        VARCHAR(10)                 NOT NULL,
 
-    CONSTRAINT user_pkey PRIMARY KEY (id)
+    CONSTRAINT user_app_pkey PRIMARY KEY (id)
 );
 
-CREATE SEQUENCE seq_user
+CREATE SEQUENCE seq_user_app
     START WITH 1
     INCREMENT BY 1;
