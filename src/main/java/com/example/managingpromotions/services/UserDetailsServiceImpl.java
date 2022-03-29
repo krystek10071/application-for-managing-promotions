@@ -1,6 +1,6 @@
 package com.example.managingpromotions.services;
 
-import com.example.managingpromotions.models.User;
+import com.example.managingpromotions.models.UserApp;
 import com.example.managingpromotions.models.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<UserApp> user = userRepository.findByUsername(username);
 
         user.orElseThrow(() -> new UsernameNotFoundException(username + " not found."));
 

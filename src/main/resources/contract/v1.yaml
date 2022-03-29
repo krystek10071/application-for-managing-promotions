@@ -21,3 +21,27 @@ components:
       properties:
         employeeCode:
           type: string
+
+    ProductDTO:
+      type: object
+      properties:
+        productName:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: currency
+        category:
+          type: string
+        expiryDate:
+          type: string
+          format: date
+
+    LoginCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string

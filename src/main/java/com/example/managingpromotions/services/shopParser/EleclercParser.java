@@ -1,6 +1,5 @@
 package com.example.managingpromotions.services.shopParser;
 
-import com.example.managingpromotions.models.ProductDTO;
 import lombok.AllArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -8,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
+import pl.managingPromotions.api.model.ProductDTO;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service("eleclercParser")
 @AllArgsConstructor
-public class EleclercParser implements IParser{
+public class EleclercParser implements IParser {
 
     private static final String URL_SHOP_PREFIX = "https://leclercdrive.lublin.pl/szukaj?controller=search&orderby=position&orderway=desc&search_query=";
     private static final String URL_SHOP_POSTFIX = "&submit_search=";
@@ -43,7 +43,7 @@ public class EleclercParser implements IParser{
                 product.setProductName(findProductNameInDocument(row));
                 product.setPrice(new BigDecimal(findPriceProduct(row)));
                 product.setDescription(findProductDescription(row));
-                product.setLinkToImage(findLinkToImage(row));
+                /*   product.setLinkToImage(findLinkToImage(row));*/
 
                 listProductDTO.add(product);
             }
