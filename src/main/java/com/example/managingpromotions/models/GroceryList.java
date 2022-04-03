@@ -36,10 +36,10 @@ public class GroceryList {
     private LocalDate modifyDate;
 
     @OneToMany(cascade = CascadeType.ALL,
-    mappedBy = "groceryList")
+            mappedBy = "groceryList")
     private Set<GroceryElement> groceryElements;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_app_id", referencedColumnName = "id")
     private UserApp userApp;
 }

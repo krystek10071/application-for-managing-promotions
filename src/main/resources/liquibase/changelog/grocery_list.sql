@@ -1,6 +1,7 @@
 CREATE TABLE grocery_list
 (
     id              BIGINT              NOT NULL,
+    name            VARCHAR(30),
     create_date     DATE                NOT NULL,
     modify_date     DATE,
     user_app_id     BIGINT,
