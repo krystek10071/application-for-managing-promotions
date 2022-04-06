@@ -213,11 +213,11 @@
 							<artifactId>lombok</artifactId>
 							<version>${lombok.version}</version>
 						</path>
-						<path>
+<!--						<path>
 							<groupId>org.hibernate</groupId>
 							<artifactId>hibernate-jpamodelgen</artifactId>
 							<version>${hibernate-jpamodelgen-version}</version>
-						</path>
+						</path>-->
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
