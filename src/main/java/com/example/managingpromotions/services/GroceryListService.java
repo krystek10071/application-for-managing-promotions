@@ -2,8 +2,10 @@ package com.example.managingpromotions.services;
 
 import com.example.managingpromotions.exception.UserNotFoundException;
 import com.example.managingpromotions.mapper.GroceryListMapper;
+import com.example.managingpromotions.models.GroceryElement;
 import com.example.managingpromotions.models.GroceryList;
 import com.example.managingpromotions.models.UserApp;
+import com.example.managingpromotions.models.repository.GroceryElementRepository;
 import com.example.managingpromotions.models.repository.GroceryListRepository;
 import com.example.managingpromotions.models.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -11,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.managingPromotions.api.model.CreateIdResponse;
-import pl.managingPromotions.api.model.GroceryListProductDTO;
+import pl.managingPromotions.api.model.GroceryListModifyRequestDTO;
 import pl.managingPromotions.api.model.GroceryListRequestDTO;
 import pl.managingPromotions.api.model.GroceryListResponseDTO;
 
@@ -24,9 +26,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GroceryListService {
 
-    private final GroceryListRepository groceryListRepository;
-    private final GroceryListMapper groceryListMapper;
     private final UserRepository userRepository;
+    private final GroceryListMapper groceryListMapper;
+    private final GroceryListRepository groceryListRepository;
+    private final GroceryElementRepository groceryElementRepository;
 
     @Transactional()
     public CreateIdResponse createGroceryList(GroceryListRequestDTO groceryListRequestDTO) {
@@ -47,17 +50,21 @@ public class GroceryListService {
     }
 
     @Transactional
-    public void patchGroceryList (final long groceryListId, List<GroceryListProductDTO> groceryListProductDTOS){
+    public void patchGroceryList(final long groceryListId, GroceryListModifyRequestDTO groceryListProductDTOS) {
 
         final Optional<GroceryList> groceryList = groceryListRepository.findById(groceryListId);
+        final List<GroceryElement> groceryElements = groceryElementRepository.findByGroceryListId(groceryListId);
 
-        //todo implements exception
+        groceryElementRepository.deleteAll(groceryElements);
+
         final GroceryList savedGroceryList = groceryList.orElseThrow();
 
-        savedGroceryList.setGroceryElements(groceryListMapper.mapListGroceryListProductDTOToListGroceryElement(groceryListProductDTOS));
+        savedGroceryList.setName(groceryListProductDTOS.getName());
         savedGroceryList.setModifyDate(LocalDate.now());
+        savedGroceryList.setGroceryElements(groceryListMapper.mapListGroceryListProductDTOToListGroceryElement(
+                groceryListProductDTOS.getProducts()));
 
-        groceryListRepository.save(savedGroceryList);
+        assignGroceryElementToGroceryList(savedGroceryList);
     }
 
     @Transactional(readOnly = true)
@@ -68,9 +75,15 @@ public class GroceryListService {
         return groceryListMapper.mapGroceryListToGroceryListResponseDTO(groceryLists);
     }
 
+    @Transactional
+    public void deleteGroceryList(long groceryListId) {
+        groceryListRepository.deleteById(groceryListId);
+    }
+
     private void assignGroceryElementToGroceryList(GroceryList groceryList) {
         groceryList.getGroceryElements().forEach(groceryElement -> {
             groceryElement.setGroceryList(groceryList);
         });
     }
+
 }

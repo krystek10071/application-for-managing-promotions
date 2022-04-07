@@ -12,7 +12,7 @@ paths:
         - Health
       responses:
         "200":
-          description : Applications is alive
+          description: Applications is alive
 
 components:
   schemas:
@@ -96,6 +96,16 @@ components:
         modifyDate:
           type: string
           format: date
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroceryListProductDTO'
+
+    GroceryListModifyRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
         products:
           type: array
           items:
