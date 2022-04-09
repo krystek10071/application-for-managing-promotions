@@ -12,10 +12,20 @@ paths:
         - Health
       responses:
         "200":
-          description : Applications is alive
+          description: Applications is alive
 
 components:
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: int
+        id:
+          type: string
+        description:
+          type: string
+
     EmployeeDTO:
       type: object
       properties:
@@ -45,3 +55,58 @@ components:
           type: string
         password:
           type: string
+
+    CreateIdResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+
+    GroceryListProductDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        unit:
+          type: string
+        amount:
+          type: int
+
+    GroceryListRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        userLogin:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroceryListProductDTO'
+
+    GroceryListResponseDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        createDate:
+          type: string
+          format: date
+        modifyDate:
+          type: string
+          format: date
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroceryListProductDTO'
+
+    GroceryListModifyRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroceryListProductDTO'

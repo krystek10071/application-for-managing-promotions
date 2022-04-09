@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -36,10 +38,11 @@ public class GroceryList {
     private LocalDate modifyDate;
 
     @OneToMany(cascade = CascadeType.ALL,
-    mappedBy = "groceryList")
+            mappedBy = "groceryList")
+    @Fetch(FetchMode.JOIN)
     private Set<GroceryElement> groceryElements;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_app_id", referencedColumnName = "id")
     private UserApp userApp;
 }
