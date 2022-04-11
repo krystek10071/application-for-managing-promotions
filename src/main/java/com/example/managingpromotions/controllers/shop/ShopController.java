@@ -1,5 +1,7 @@
 package com.example.managingpromotions.controllers.shop;
 
+import com.example.managingpromotions.services.GroceryListService;
+import com.example.managingpromotions.services.ShopService;
 import com.example.managingpromotions.services.shopParser.AuchanParser;
 import com.example.managingpromotions.services.shopParser.CarrefourParser;
 import com.example.managingpromotions.services.shopParser.EleclercParser;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.managingPromotions.api.model.ProductDTO;
+import pl.managingPromotions.api.model.ProductParsedFromShopDTO;
 
 import java.util.List;
 
@@ -17,10 +20,13 @@ import java.util.List;
 @AllArgsConstructor
 public class ShopController {
 
-    private final CarrefourParser carrefourParser;
+    private final ShopService shopService;
     private final AuchanParser auchanParser;
-    private final EleclercParser eleclercParser;
     private final GroszekParser groszekParser;
+    private final EleclercParser eleclercParser;
+    private final CarrefourParser carrefourParser;
+    private final GroceryListService groceryListService;
+
 
     @GetMapping("/carrefour")
     List<ProductDTO> findProductInCareFour(@RequestParam String nameProduct) {
@@ -44,5 +50,10 @@ public class ShopController {
     List<ProductDTO> findProductInGroszek(@RequestParam String nameProduct) {
         Document document = groszekParser.fetchDataFromWeb(nameProduct);
         return groszekParser.prepareData(document);
+    }
+
+    @GetMapping(value = "/best-shop")
+    List<ProductParsedFromShopDTO> getTheCheapestShop(@RequestParam Long groceryListId){
+        return shopService.getCheapestShop(groceryListId);
     }
 }

@@ -30,4 +30,13 @@ public class GlobalExceptionHandler {
 
         return ErrorResponseUtils.createErrorResponse(HttpStatus.NOT_FOUND.value(), description, description);
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNotFoundException(UserNotFoundException ex) {
+        String description = "Not Found elements for: ";
+        log.error(description);
+
+        return ErrorResponseUtils.createErrorResponse(HttpStatus.NOT_FOUND.value(), description, description);
+    }
 }

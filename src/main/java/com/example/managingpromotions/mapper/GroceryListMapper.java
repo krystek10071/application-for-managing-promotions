@@ -23,4 +23,6 @@ public interface GroceryListMapper {
     List<GroceryListResponseDTO> mapGroceryListToGroceryListResponseDTO(List<GroceryList> groceryLists);
 
     Set<GroceryElement> mapListGroceryListProductDTOToListGroceryElement(List<GroceryListProductDTO> groceryListProductDTOS);
+
+    List<GroceryListProductDTO> mapSetGroceryElementToGroceryListProductDTO(Set<GroceryElement> groceryElements);
 }
