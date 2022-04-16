@@ -1,5 +1,6 @@
 package com.example.managingpromotions.controllers.shop;
 
+import com.example.managingpromotions.services.ShopService;
 import com.example.managingpromotions.services.shopParser.AuchanParser;
 import com.example.managingpromotions.services.shopParser.CarrefourParser;
 import com.example.managingpromotions.services.shopParser.EleclercParser;
@@ -17,10 +18,11 @@ import java.util.List;
 @AllArgsConstructor
 public class ShopController {
 
-    private final CarrefourParser carrefourParser;
+    private final ShopService shopService;
     private final AuchanParser auchanParser;
-    private final EleclercParser eleclercParser;
     private final GroszekParser groszekParser;
+    private final EleclercParser eleclercParser;
+    private final CarrefourParser carrefourParser;
 
     @GetMapping("/carrefour")
     List<ProductDTO> findProductInCareFour(@RequestParam String nameProduct) {

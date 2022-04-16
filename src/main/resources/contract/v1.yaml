@@ -110,3 +110,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GroceryListProductDTO'
+
+    ParsedProductDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        unit:
+          type: string
+        amount:
+          type: int
+        price:
+          type: number
+          format: currency
+
+    ProductParsedFromShopDTO:
+      type: object
+      properties:
+        shopName:
+          type: string
+        groceryListId:
+          type: integer
+          format: int64
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedProductDTO'
+
+    ShopEnum:
+      type: string
+      enum:
+        - ELECLERC
+        - CARREFOUR
+        - AUCHAN
+        - GROSZEK
