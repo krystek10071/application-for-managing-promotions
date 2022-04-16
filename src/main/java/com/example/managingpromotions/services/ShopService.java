@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.managingPromotions.api.model.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,18 +34,25 @@ public class ShopService {
     @Transactional
     public List<ProductParsedFromShopDTO> getCheapestShop(Long groceryListId) {
         List<ProductParsedFromShopDTO> productParsedFromShopDTOS = new ArrayList<>();
-
         Optional<GroceryList> groceryList = groceryListRepository.findById(groceryListId);
 
         List<GroceryListProductDTO> groceryListProductDTOS = groceryListMapper.mapSetGroceryElementToGroceryListProductDTO(
                 groceryList.orElseThrow(() ->
                         new ResourceNotFoundException(String.valueOf(groceryListId))).getGroceryElements());
 
-        for (GroceryListProductDTO productDTO : groceryListProductDTOS) {
-            productParsedFromShopDTOS.add(fetchDataFromEleclerc(productDTO, groceryListId));
-        }
+        groceryListProductDTOS.forEach(
+                productDTO -> productParsedFromShopDTOS.add(fetchDataFromEleclerc(productDTO, groceryListId)));
 
-        return Collections.emptyList();
+        groceryListProductDTOS.forEach(
+                productDTO -> productParsedFromShopDTOS.add(fetchDataFromAuchan(productDTO, groceryListId)));
+
+        groceryListProductDTOS.forEach(
+                productDTO -> productParsedFromShopDTOS.add(fetchDataFromCarrefour(productDTO, groceryListId)));
+
+        groceryListProductDTOS.forEach(
+                productDTO -> productParsedFromShopDTOS.add(fetchDataFromGroszek(productDTO, groceryListId)));
+
+        return productParsedFromShopDTOS;
     }
 
     private ProductParsedFromShopDTO fetchDataFromEleclerc(GroceryListProductDTO groceryListProductDTO, Long groceryListId) {
@@ -57,7 +63,7 @@ public class ShopService {
         productParsedFromShopDTO.setGroceryListId(groceryListId);
         productParsedFromShopDTO.setShopName(ShopEnum.ELECLERC.getValue());
 
-        List<ProductDTO> productDTOS = eleclercParser.prepareData(document).subList(0, 5);
+        List<ProductDTO> productDTOS = checkProductDTOSize(eleclercParser.prepareData(document));
         List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
 
         parsedProductDTOS.forEach(productParsedDTO -> {
@@ -65,9 +71,79 @@ public class ShopService {
             productParsedDTO.amount(groceryListProductDTO.getAmount());
         });
 
-         productParsedFromShopDTO.setProducts(parsedProductDTOS);
+        productParsedFromShopDTO.setProducts(parsedProductDTOS);
 
-         return productParsedFromShopDTO;
+        return productParsedFromShopDTO;
     }
 
+    private ProductParsedFromShopDTO fetchDataFromAuchan(GroceryListProductDTO groceryListProductDTO, Long groceryListId) {
+        Document document = auchanParser.fetchDataFromWeb(groceryListProductDTO.getName());
+
+        ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
+
+        productParsedFromShopDTO.setGroceryListId(groceryListId);
+        productParsedFromShopDTO.setShopName(ShopEnum.AUCHAN.getValue());
+
+        List<ProductDTO> productDTOS = checkProductDTOSize(auchanParser.prepareData(document));
+        List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
+
+        parsedProductDTOS.forEach(productParsedDTO -> {
+            productParsedDTO.setUnit(groceryListProductDTO.getUnit());
+            productParsedDTO.amount(groceryListProductDTO.getAmount());
+        });
+
+        productParsedFromShopDTO.setProducts(parsedProductDTOS);
+
+        return productParsedFromShopDTO;
+    }
+
+    private ProductParsedFromShopDTO fetchDataFromCarrefour(GroceryListProductDTO groceryListProductDTO, Long groceryListId) {
+        Document document = carrefourParser.fetchDataFromWeb(groceryListProductDTO.getName());
+
+        ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
+
+        productParsedFromShopDTO.setGroceryListId(groceryListId);
+        productParsedFromShopDTO.setShopName(ShopEnum.CARREFOUR.getValue());
+
+        List<ProductDTO> productDTOS = checkProductDTOSize(carrefourParser.prepareData(document));
+        List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
+
+        parsedProductDTOS.forEach(productParsedDTO -> {
+            productParsedDTO.setUnit(groceryListProductDTO.getUnit());
+            productParsedDTO.amount(groceryListProductDTO.getAmount());
+        });
+
+        productParsedFromShopDTO.setProducts(parsedProductDTOS);
+
+        return productParsedFromShopDTO;
+    }
+
+    private ProductParsedFromShopDTO fetchDataFromGroszek(GroceryListProductDTO groceryListProductDTO, Long groceryListId) {
+        Document document = groszekParser.fetchDataFromWeb(groceryListProductDTO.getName());
+
+        ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
+
+        productParsedFromShopDTO.setGroceryListId(groceryListId);
+        productParsedFromShopDTO.setShopName(ShopEnum.GROSZEK.getValue());
+
+        List<ProductDTO> productDTOS = checkProductDTOSize(groszekParser.prepareData(document));
+        List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
+
+        parsedProductDTOS.forEach(productParsedDTO -> {
+            productParsedDTO.setUnit(groceryListProductDTO.getUnit());
+            productParsedDTO.amount(groceryListProductDTO.getAmount());
+        });
+
+        productParsedFromShopDTO.setProducts(parsedProductDTOS);
+
+        return productParsedFromShopDTO;
+    }
+
+    private List<ProductDTO> checkProductDTOSize(List<ProductDTO> productDTOS) {
+
+        if (productDTOS.size() >= 4) {
+            return productDTOS.subList(0, 4);
+        }
+        return productDTOS;
+    }
 }
