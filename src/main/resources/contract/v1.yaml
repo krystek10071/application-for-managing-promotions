@@ -122,7 +122,6 @@ components:
           type: int
         price:
           type: number
-          format: currency
 
     ProductParsedFromShopDTO:
       type: object
@@ -144,3 +143,28 @@ components:
         - CARREFOUR
         - AUCHAN
         - GROSZEK
+
+    CheapestShoppingReponse:
+      type: object
+      properties:
+        shopName:
+          type: string
+        groceryListId:
+          type: integer
+          format: int64
+        price:
+          type: number
+          format: currency
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParsedProductDTO'
+
+    ListProductParsedFromShopDTO:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductParsedFromShopDTO'
+

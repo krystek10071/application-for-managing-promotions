@@ -15,9 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.managingPromotions.api.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -145,5 +144,44 @@ public class ShopService {
             return productDTOS.subList(0, 4);
         }
         return productDTOS;
+    }
+
+    public CheapestShoppingReponse findCheapestProduct(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
+
+        Map<String, BigDecimal> valuesOfPurchasesFromShop = new HashMap<>();
+
+        productParsedFromShopDTOS.forEach(
+                productParsedFromShopDTO -> {
+                    List<ParsedProductDTO> parsedProductDTOS = productParsedFromShopDTO.getProducts();
+                    BigDecimal totalPrice = calculateTotalPrice(parsedProductDTOS);
+                    valuesOfPurchasesFromShop.put(productParsedFromShopDTO.getShopName(), totalPrice);
+                }
+        );
+
+        Map.Entry<String, BigDecimal> cheapestShopWithGroceryValue = choseCheapestShop(valuesOfPurchasesFromShop);
+
+        return CheapestShoppingReponse.builder()
+                .shopName(cheapestShopWithGroceryValue.getKey())
+                .price(cheapestShopWithGroceryValue.getValue())
+                .products(productParsedFromShopDTOS.get(0).getProducts())
+                .groceryListId(productParsedFromShopDTOS.get(0).getGroceryListId())
+                .build();
+    }
+
+    private BigDecimal calculateTotalPrice(List<ParsedProductDTO> parsedProductDTOS) {
+
+        final BigDecimal[] totalPrices = {new BigDecimal("0.00")};
+
+        parsedProductDTOS.forEach(parsedProductDTO -> {
+            BigDecimal bigDecimal = parsedProductDTO.getPrice().multiply(BigDecimal.valueOf(parsedProductDTO.getAmount()));
+
+            totalPrices[0] = totalPrices[0].add(bigDecimal);
+        });
+
+        return totalPrices[0];
+    }
+
+    private Map.Entry<String, BigDecimal> choseCheapestShop(Map<String, BigDecimal> valuesOfPurchasesFromShop) {
+        return Collections.min(valuesOfPurchasesFromShop.entrySet(), Map.Entry.comparingByValue());
     }
 }
