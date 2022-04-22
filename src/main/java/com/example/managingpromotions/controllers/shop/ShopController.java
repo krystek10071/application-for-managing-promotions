@@ -14,8 +14,9 @@ import pl.managingPromotions.api.model.ProductDTO;
 
 import java.util.List;
 
-@RestController("api/v1/shops")
+@RestController
 @AllArgsConstructor
+@RequestMapping(value = "api/v1/shops")
 public class ShopController {
 
     private final ShopService shopService;
@@ -24,25 +25,25 @@ public class ShopController {
     private final EleclercParser eleclercParser;
     private final CarrefourParser carrefourParser;
 
-    @GetMapping("/carrefour")
+    @GetMapping(value = "/carrefour")
     public List<ProductDTO> findProductInCareFour(@RequestParam String nameProduct) {
         Document document = carrefourParser.fetchDataFromWeb(nameProduct);
         return carrefourParser.prepareData(document);
     }
 
-    @GetMapping("/auchan")
+    @GetMapping(value = "/auchan")
     public List<ProductDTO> findProductInAuchan(@RequestParam String nameProduct) {
         Document document = auchanParser.fetchDataFromWeb(nameProduct);
         return auchanParser.prepareData(document);
     }
 
-    @GetMapping("/eleclerc")
+    @GetMapping(value = "/eleclerc")
     public List<ProductDTO> findProductInEleclerc(@RequestParam String nameProduct) {
         Document document = eleclercParser.fetchDataFromWeb(nameProduct);
         return eleclercParser.prepareData(document);
     }
 
-    @GetMapping("/groszek")
+    @GetMapping(value = "/groszek")
     public List<ProductDTO> findProductInGroszek(@RequestParam String nameProduct) {
         Document document = groszekParser.fetchDataFromWeb(nameProduct);
         return groszekParser.prepareData(document);

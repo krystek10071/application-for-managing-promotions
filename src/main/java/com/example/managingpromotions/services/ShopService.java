@@ -158,7 +158,14 @@ public class ShopService {
                 }
         );
 
-        return choseeCheapestShop(valuesOfPurchasesFromShop);
+        Map.Entry<String, BigDecimal> cheapestShopWithGroceryValue = choseCheapestShop(valuesOfPurchasesFromShop);
+
+        return CheapestShoppingReponse.builder()
+                .shopName(cheapestShopWithGroceryValue.getKey())
+                .price(cheapestShopWithGroceryValue.getValue())
+                .products(productParsedFromShopDTOS.get(0).getProducts())
+                .groceryListId(productParsedFromShopDTOS.get(0).getGroceryListId())
+                .build();
     }
 
     private BigDecimal calculateTotalPrice(List<ParsedProductDTO> parsedProductDTOS) {
@@ -174,10 +181,7 @@ public class ShopService {
         return totalPrices[0];
     }
 
-    private CheapestShoppingReponse choseeCheapestShop(Map<String, BigDecimal> valuesOfPurchasesFromShop) {
-
-        Map.Entry<String, BigDecimal> key = Collections.min(valuesOfPurchasesFromShop.entrySet(), Map.Entry.comparingByValue());
-
-        return null;
+    private Map.Entry<String, BigDecimal> choseCheapestShop(Map<String, BigDecimal> valuesOfPurchasesFromShop) {
+        return Collections.min(valuesOfPurchasesFromShop.entrySet(), Map.Entry.comparingByValue());
     }
 }
