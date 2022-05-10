@@ -10,7 +10,7 @@ public class SeleniumConfig {
 
     @Bean
     public WebDriver webDriver(){
-         System.setProperty("webdriver.chrome.driver", "D:\\Praca dyplomowa KUL\\managing-promotions\\src\\main\\resources\\webdriver\\chromedriver.exe");
+         System.setProperty("webdriver.chrome.driver", "src/main/resources/webdriver/chromedriver.exe");
         return new ChromeDriver();
     }
 }
