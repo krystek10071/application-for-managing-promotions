@@ -19,10 +19,14 @@ public interface GroceryListMapper {
     @Mapping(source = "products", target = "groceryElements")
     GroceryList mapGroceryListRequestDTOToGroceryList(GroceryListRequestDTO groceryListRequestDTO);
 
-    @Mapping(source = "GroceryList.groceryElements", target = "GroceryListResponseDTO.products")
     List<GroceryListResponseDTO> mapGroceryListToGroceryListResponseDTO(List<GroceryList> groceryLists);
 
-    Set<GroceryElement> mapListGroceryListProductDTOToListGroceryElement(List<GroceryListProductDTO> groceryListProductDTOS);
+    @Mapping(source = "groceryElements", target = "products")
+    GroceryListResponseDTO mapGroceryListToGroceryListResponseDTO(GroceryList groceryList);
 
     List<GroceryListProductDTO> mapSetGroceryElementToGroceryListProductDTO(Set<GroceryElement> groceryElements);
+
+    GroceryListProductDTO mapGroceryElementToGroceryListProductDTO(GroceryElement groceryElement);
+
+    Set<GroceryElement> mapListGroceryListProductDTOToListGroceryElement(List<GroceryListProductDTO> groceryListProductDTOS);
 }
