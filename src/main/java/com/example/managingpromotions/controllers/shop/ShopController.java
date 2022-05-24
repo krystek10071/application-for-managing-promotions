@@ -9,8 +9,8 @@ import lombok.AllArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.springframework.web.bind.annotation.*;
 import pl.managingPromotions.api.model.CheapestShoppingReponse;
-import pl.managingPromotions.api.model.ListProductParsedFromShopDTO;
 import pl.managingPromotions.api.model.ProductDTO;
+import pl.managingPromotions.api.model.ProductParsedFromShopDTO;
 
 import java.util.List;
 
@@ -50,8 +50,8 @@ public class ShopController {
     }
 
     @PostMapping(value = "/best-shop")
-    public CheapestShoppingReponse findCheapestProducts(@RequestBody ListProductParsedFromShopDTO productParsedFromShopDTO) {
+    public List<CheapestShoppingReponse> findCheapestProducts(@RequestBody List<ProductParsedFromShopDTO> productParsedFromShopDTO) {
 
-        return shopService.findCheapestProduct(productParsedFromShopDTO.getProducts());
+        return shopService.findCheapestProduct(productParsedFromShopDTO);
     }
 }

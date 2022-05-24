@@ -61,7 +61,6 @@ public class EleclercParser implements IParser {
 
     private Document fetchDataByWebDriver(String eleclercProductUrl) {
         webDriver.get(eleclercProductUrl);
-        System.out.println(webDriver.getPageSource());
         return Jsoup.parse(webDriver.getPageSource());
     }
 

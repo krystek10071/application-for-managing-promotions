@@ -64,7 +64,6 @@ public class GroszekParser implements IParser {
 
     private Document fetchDataByWebDriver(String groszekProducts) {
         webDriver.get(groszekProducts);
-        System.out.println(webDriver.getPageSource());
         return Jsoup.parse(webDriver.getPageSource());
     }
 }

@@ -88,6 +88,9 @@ components:
     GroceryListResponseDTO:
       type: object
       properties:
+        id:
+          type: integer
+          format: int64
         name:
           type: string
         createDate:
@@ -159,12 +162,4 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ParsedProductDTO'
-
-    ListProductParsedFromShopDTO:
-      type: object
-      properties:
-        products:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductParsedFromShopDTO'
 
