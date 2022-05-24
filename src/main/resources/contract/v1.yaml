@@ -163,11 +163,3 @@ components:
           items:
             $ref: '#/components/schemas/ParsedProductDTO'
 
-    ListProductParsedFromShopDTO:
-      type: object
-      properties:
-        products:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductParsedFromShopDTO'
-

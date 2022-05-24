@@ -146,25 +146,32 @@ public class ShopService {
         return productDTOS;
     }
 
-    public CheapestShoppingReponse findCheapestProduct(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
+    public List<CheapestShoppingReponse> findCheapestProduct(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
 
-        Map<String, BigDecimal> valuesOfPurchasesFromShop = new HashMap<>();
+        List<CheapestShoppingReponse> cheapestShoppingResponseDTO = new ArrayList<>();
 
         productParsedFromShopDTOS.forEach(
                 productParsedFromShopDTO -> {
                     List<ParsedProductDTO> parsedProductDTOS = productParsedFromShopDTO.getProducts();
                     BigDecimal totalPrice = calculateTotalPrice(parsedProductDTOS);
-                    valuesOfPurchasesFromShop.put(productParsedFromShopDTO.getShopName(), totalPrice);
+
+                    CheapestShoppingReponse cheapestShoppingReponse = createCheapestShoppingResponse(productParsedFromShopDTO, totalPrice);
+                    cheapestShoppingResponseDTO.add(cheapestShoppingReponse);
                 }
         );
 
-        Map.Entry<String, BigDecimal> cheapestShopWithGroceryValue = choseCheapestShop(valuesOfPurchasesFromShop);
+        cheapestShoppingResponseDTO.sort(Comparator.comparing(CheapestShoppingReponse::getPrice));
 
+        return cheapestShoppingResponseDTO;
+    }
+
+    private CheapestShoppingReponse createCheapestShoppingResponse(ProductParsedFromShopDTO productParsedFromShopDTO,
+                                                                   BigDecimal totalPrice) {
         return CheapestShoppingReponse.builder()
-                .shopName(cheapestShopWithGroceryValue.getKey())
-                .price(cheapestShopWithGroceryValue.getValue())
-                .products(productParsedFromShopDTOS.get(0).getProducts())
-                .groceryListId(productParsedFromShopDTOS.get(0).getGroceryListId())
+                .shopName(productParsedFromShopDTO.getShopName())
+                .groceryListId(productParsedFromShopDTO.getGroceryListId())
+                .products(productParsedFromShopDTO.getProducts())
+                .price(totalPrice)
                 .build();
     }
 
