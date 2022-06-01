@@ -12,7 +12,6 @@ import com.example.managingpromotions.services.shopParser.GroszekParser;
 import lombok.AllArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pl.managingPromotions.api.model.*;
 
 import java.math.BigDecimal;
@@ -30,16 +29,61 @@ public class ShopService {
     private final GroceryListMapper groceryListMapper;
     private final GroceryListRepository groceryListRepository;
 
-    @Transactional
-    public List<ProductParsedFromShopDTO> getCheapestShop(Long groceryListId) {
-        List<ProductParsedFromShopDTO> productParsedFromShopDTOS = new ArrayList<>();
+    public List<ProductParsedFromShopDTO> getCheapestShop(Long groceryListId) throws InterruptedException {
+        List<ProductParsedFromShopDTO> productParsedFromShopDTOS = Collections.synchronizedList(new ArrayList<>());
         Optional<GroceryList> groceryList = groceryListRepository.findById(groceryListId);
 
         List<GroceryListProductDTO> groceryListProductDTOS = groceryListMapper.mapSetGroceryElementToGroceryListProductDTO(
                 groceryList.orElseThrow(() ->
                         new ResourceNotFoundException(String.valueOf(groceryListId))).getGroceryElements());
 
-        groceryListProductDTOS.forEach(
+        List<GroceryListProductDTO> groceryListProductDTOSSynchronized = Collections.synchronizedList(groceryListProductDTOS);
+
+        //todo thread
+
+        Thread thread1 = new Thread(() -> {
+            synchronized (groceryListProductDTOSSynchronized) {
+                groceryListProductDTOSSynchronized.forEach(
+                        productDTO -> productParsedFromShopDTOS.add(fetchDataFromEleclerc(productDTO, groceryListId)));
+            }
+        });
+
+/*        Thread thread2 = new Thread(() -> {
+            synchronized (groceryListProductDTOSSynchronized) {
+                groceryListProductDTOSSynchronized.forEach(
+                        productDTO -> productParsedFromShopDTOS.add(fetchDataFromAuchan(productDTO, groceryListId)));
+            }
+        });
+
+        Thread thread3 = new Thread(() -> {
+            synchronized (groceryListProductDTOSSynchronized) {
+                groceryListProductDTOSSynchronized.forEach(
+                        productDTO -> productParsedFromShopDTOS.add(fetchDataFromCarrefour(productDTO, groceryListId)));
+            }
+        });*/
+
+        Thread thread4 = new Thread(() -> {
+            synchronized (groceryListProductDTOSSynchronized) {
+                groceryListProductDTOSSynchronized.forEach(
+                        productDTO -> productParsedFromShopDTOS.add(fetchDataFromGroszek(productDTO, groceryListId)));
+            }
+        });
+
+        thread1.start();
+        //  thread2.start();
+        //  thread3.start();
+        thread4.start();
+
+        thread1.join();
+        //  thread2.join();
+        //  thread3.join();
+        thread4.join();
+    /*    thread2.start();
+        thread3.start();
+        thread4.start();*/
+
+
+/*        groceryListProductDTOS.forEach(
                 productDTO -> productParsedFromShopDTOS.add(fetchDataFromEleclerc(productDTO, groceryListId)));
 
         groceryListProductDTOS.forEach(
@@ -49,7 +93,7 @@ public class ShopService {
                 productDTO -> productParsedFromShopDTOS.add(fetchDataFromCarrefour(productDTO, groceryListId)));
 
         groceryListProductDTOS.forEach(
-                productDTO -> productParsedFromShopDTOS.add(fetchDataFromGroszek(productDTO, groceryListId)));
+                productDTO -> productParsedFromShopDTOS.add(fetchDataFromGroszek(productDTO, groceryListId)));*/
 
         return productParsedFromShopDTOS;
     }

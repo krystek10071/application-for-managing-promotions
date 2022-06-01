@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pl.managingPromotions.api.model.ProductDTO;
 
@@ -21,7 +22,8 @@ public class EleclercParser implements IParser {
     private static final String URL_SHOP_PREFIX = "https://leclercdrive.lublin.pl/szukaj?controller=search&orderby=position&orderway=desc&search_query=";
     private static final String URL_SHOP_POSTFIX = "&submit_search=";
 
-    private final WebDriver webDriver;
+    @Qualifier("edgeDriver")
+    private final WebDriver edgeDriver;
 
     @Override
     public Document fetchDataFromWeb(String nameProduct) {
@@ -60,8 +62,9 @@ public class EleclercParser implements IParser {
     }
 
     private Document fetchDataByWebDriver(String eleclercProductUrl) {
-        webDriver.get(eleclercProductUrl);
-        return Jsoup.parse(webDriver.getPageSource());
+        // WebDriver webDriver = new ChromeDriver();
+        edgeDriver.get(eleclercProductUrl);
+        return Jsoup.parse(edgeDriver.getPageSource());
     }
 
     private String findPriceProduct(Element row) {

@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pl.managingPromotions.api.model.ProductDTO;
 
@@ -20,7 +21,8 @@ public class GroszekParser implements IParser {
     private static final String URL_SHOP_PREFIX = "http://egroszek.pl/szukaj.html?q=";
     private static final String FIND_PRODUCTS_STATEMENT = "div.col-md-9:nth-child(2) > div:nth-child(2) > div";
 
-    private final WebDriver webDriver;
+    @Qualifier("chromeDriver")
+    private final WebDriver operaDriver;
 
     @Override
     public Document fetchDataFromWeb(String nameProduct) {
@@ -63,7 +65,7 @@ public class GroszekParser implements IParser {
     }
 
     private Document fetchDataByWebDriver(String groszekProducts) {
-        webDriver.get(groszekProducts);
-        return Jsoup.parse(webDriver.getPageSource());
+        operaDriver.get(groszekProducts);
+        return Jsoup.parse(operaDriver.getPageSource());
     }
 }

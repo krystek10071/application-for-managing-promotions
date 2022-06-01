@@ -44,7 +44,7 @@ public class GroceryListController {
     }
 
     @GetMapping(value = "/{groceryList}/product-shop")
-    List<ProductParsedFromShopDTO> getTheCheapestShop(@RequestParam Long groceryListId){
+    List<ProductParsedFromShopDTO> getTheCheapestShop(@RequestParam Long groceryListId) throws InterruptedException {
         return shopService.getCheapestShop(groceryListId);
     }
 }

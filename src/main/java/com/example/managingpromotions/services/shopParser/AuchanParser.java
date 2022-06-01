@@ -7,7 +7,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.managingPromotions.api.model.ProductDTO;
 
 import java.math.BigDecimal;
@@ -22,9 +24,11 @@ public class AuchanParser implements IParser {
     private static final String URL_SHOP_PREFIX = "https://zakupy.auchan.pl/shop/search?q%5B%5D=";
     private static final String URL_SHOP_POSTFIX = "&qq=%7B%7D";
 
-    private final WebDriver webDriver;
+    @Qualifier("operaDriver")
+    private final WebDriver chromeDriver;
 
     @Override
+    @Transactional
     public Document fetchDataFromWeb(String nameProduct) {
         String auchanProductUrl = URL_SHOP_PREFIX + nameProduct + URL_SHOP_POSTFIX;
         return fetchDataByWebDriver(auchanProductUrl);
@@ -53,8 +57,8 @@ public class AuchanParser implements IParser {
     }
 
     private Document fetchDataByWebDriver(String auchanProductUrl) {
-        webDriver.get(auchanProductUrl);
-        return Jsoup.parse(webDriver.getPageSource());
+        chromeDriver.get(auchanProductUrl);
+        return Jsoup.parse(chromeDriver.getPageSource());
     }
 
     private String findProductNameInDocument(Element row) {

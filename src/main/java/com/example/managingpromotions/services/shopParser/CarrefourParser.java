@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pl.managingPromotions.api.model.ProductDTO;
 
@@ -22,7 +23,8 @@ public class CarrefourParser implements IParser {
 
     private static final String URL_SHOP = "https://www.carrefour.pl/szukaj?page=0&size=10&q=";
 
-    private final WebDriver webDriver;
+    @Qualifier("firefoxDriver")
+    private final WebDriver firefoxDriver;
 
     @Override
     public Document fetchDataFromWeb(String nameProduct) {
@@ -70,8 +72,8 @@ public class CarrefourParser implements IParser {
 
 
     private Document fetchDataByWebDriver(String url) {
-        webDriver.get(url);
-        return Jsoup.parse(webDriver.getPageSource());
+        firefoxDriver.get(url);
+        return Jsoup.parse(firefoxDriver.getPageSource());
     }
 
     private String prepareUrl(String nameProduct) {
