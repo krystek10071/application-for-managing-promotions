@@ -16,6 +16,8 @@ import pl.managingPromotions.api.model.*;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -192,9 +194,11 @@ public class ShopService {
 
     public List<CheapestShoppingReponse> findCheapestProduct(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
 
+        List<ProductParsedFromShopDTO> convertedProductParsedFromShop = prepareData(productParsedFromShopDTOS);
+
         List<CheapestShoppingReponse> cheapestShoppingResponseDTO = new ArrayList<>();
 
-        productParsedFromShopDTOS.forEach(
+        convertedProductParsedFromShop.forEach(
                 productParsedFromShopDTO -> {
                     List<ParsedProductDTO> parsedProductDTOS = productParsedFromShopDTO.getProducts();
                     BigDecimal totalPrice = calculateTotalPrice(parsedProductDTOS);
@@ -207,6 +211,35 @@ public class ShopService {
         cheapestShoppingResponseDTO.sort(Comparator.comparing(CheapestShoppingReponse::getPrice));
 
         return cheapestShoppingResponseDTO;
+    }
+
+    private List<ProductParsedFromShopDTO> prepareData(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
+
+        List<ProductParsedFromShopDTO> productsParsedAfterConvert = new ArrayList<>();
+
+        List<String> shopNamesFromResponse = productParsedFromShopDTOS.stream()
+                .map(ProductParsedFromShopDTO::getShopName)
+                .distinct()
+                .collect(Collectors.toList());
+
+        shopNamesFromResponse.forEach(shopName -> {
+
+            List<ParsedProductDTO> parsedProductDTOS = productParsedFromShopDTOS.stream()
+                    .filter(productParsedFromShopDTO -> productParsedFromShopDTO.getShopName().equals(shopName))
+                    .map(ProductParsedFromShopDTO::getProducts)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+
+            ProductParsedFromShopDTO productParsedFromShopDTO = ProductParsedFromShopDTO.builder()
+                    .shopName(shopName)
+                    .products(parsedProductDTOS)
+                    .build();
+
+            productsParsedAfterConvert.add(productParsedFromShopDTO);
+        });
+
+        return productsParsedAfterConvert;
+
     }
 
     private CheapestShoppingReponse createCheapestShoppingResponse(ProductParsedFromShopDTO productParsedFromShopDTO,
