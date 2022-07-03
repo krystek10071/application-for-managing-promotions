@@ -3,8 +3,8 @@ package com.example.managingpromotions.services;
 import com.example.managingpromotions.exception.ResourceNotFoundException;
 import com.example.managingpromotions.mapper.GroceryListMapper;
 import com.example.managingpromotions.mapper.ProductMapper;
-import com.example.managingpromotions.models.GroceryList;
-import com.example.managingpromotions.models.repository.GroceryListRepository;
+import com.example.managingpromotions.model.GroceryList;
+import com.example.managingpromotions.model.repository.GroceryListRepository;
 import com.example.managingpromotions.services.shopParser.AuchanParser;
 import com.example.managingpromotions.services.shopParser.CarrefourParser;
 import com.example.managingpromotions.services.shopParser.EleclercParser;
@@ -17,7 +17,6 @@ import pl.managingPromotions.api.model.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor

@@ -1,6 +1,6 @@
 package com.example.managingpromotions.services;
 
-import com.example.managingpromotions.models.UserApp;
+import com.example.managingpromotions.model.UserApp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;

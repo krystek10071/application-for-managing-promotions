@@ -1,7 +1,7 @@
 package com.example.managingpromotions.services;
 
-import com.example.managingpromotions.models.UserApp;
-import com.example.managingpromotions.models.repository.UserRepository;
+import com.example.managingpromotions.model.UserApp;
+import com.example.managingpromotions.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

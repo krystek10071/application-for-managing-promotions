@@ -1,6 +1,6 @@
-package com.example.managingpromotions.models.repository;
+package com.example.managingpromotions.model.repository;
 
-import com.example.managingpromotions.models.GroceryList;
+import com.example.managingpromotions.model.GroceryList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

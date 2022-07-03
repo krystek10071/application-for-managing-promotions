@@ -2,12 +2,12 @@ package com.example.managingpromotions.services;
 
 import com.example.managingpromotions.exception.UserNotFoundException;
 import com.example.managingpromotions.mapper.GroceryListMapper;
-import com.example.managingpromotions.models.GroceryElement;
-import com.example.managingpromotions.models.GroceryList;
-import com.example.managingpromotions.models.UserApp;
-import com.example.managingpromotions.models.repository.GroceryElementRepository;
-import com.example.managingpromotions.models.repository.GroceryListRepository;
-import com.example.managingpromotions.models.repository.UserRepository;
+import com.example.managingpromotions.model.GroceryElement;
+import com.example.managingpromotions.model.GroceryList;
+import com.example.managingpromotions.model.UserApp;
+import com.example.managingpromotions.model.repository.GroceryElementRepository;
+import com.example.managingpromotions.model.repository.GroceryListRepository;
+import com.example.managingpromotions.model.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

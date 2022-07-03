@@ -4,7 +4,7 @@ import com.example.managingpromotions.filters.JsonObjectAuthenticationFilter;
 import com.example.managingpromotions.filters.JwtAuthorizationFilter;
 import com.example.managingpromotions.filters.RestAuthenticationFailureHandler;
 import com.example.managingpromotions.filters.RestAuthenticationSuccessHandler;
-import com.example.managingpromotions.models.repository.UserRepository;
+import com.example.managingpromotions.model.repository.UserRepository;
 import com.example.managingpromotions.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

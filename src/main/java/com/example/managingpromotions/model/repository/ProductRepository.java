@@ -1,6 +1,6 @@
-package com.example.managingpromotions.models.repository;
+package com.example.managingpromotions.model.repository;
 
-import com.example.managingpromotions.models.Product;
+import com.example.managingpromotions.model.Product;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
