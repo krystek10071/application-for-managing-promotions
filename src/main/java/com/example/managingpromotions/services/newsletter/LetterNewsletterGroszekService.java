@@ -1,6 +1,5 @@
 package com.example.managingpromotions.services.newsletter;
 
-import com.example.managingpromotions.model.NewsletterFile;
 import com.example.managingpromotions.model.NewsletterFileRepository;
 import com.example.managingpromotions.model.UserApp;
 import com.example.managingpromotions.model.repository.UserRepository;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -50,10 +48,6 @@ public class LetterNewsletterGroszekService {
         String fileName;
         Date dateFrom;
         Date dateTol;
-
-
-
-
     }
 
 }

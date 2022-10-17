@@ -15,11 +15,11 @@ public class SeleniumConfig {
 
     private static final String FILE_DOWNLOAD_LOCATION = "C:\\projects\\managing-promotions\\src\\main\\resources\\file\\newslater\\groszek";
 
-    @Bean
+/*    @Bean
     public WebDriver chromeDriver() {
         System.setProperty("webdriver.chrome.driver", "src/main/resources/webdriver/chromedriver.exe");
         return new ChromeDriver();
-    }
+    }*/
 
     @Bean
     public WebDriver firefoxDriver() {
@@ -46,7 +46,7 @@ public class SeleniumConfig {
         return new FirefoxDriver(firefoxOptions);
     }
 
-    @Bean
+/*    @Bean
     public WebDriver edgeDriver() {
         System.setProperty("webdriver.edge.driver", "src/main/resources/webdriver/msedgedriver.exe");
         return new EdgeDriver();
@@ -56,5 +56,5 @@ public class SeleniumConfig {
     public WebDriver operaDriver() {
         System.setProperty("webdriver.opera.driver", "src/main/resources/webdriver/operadriver.exe");
         return new OperaDriver();
-    }
+    }*/
 }

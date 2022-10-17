@@ -1,65 +1,50 @@
 package com.example.managingpromotions.services.newsletter;
 
 import lombok.AllArgsConstructor;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpEntity;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.util.Set;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.http.HttpClient;
 
 @Service
 @AllArgsConstructor
-public class LetterNewsletterServiceEleclerc {
+public class LetterNewsletterServiceEleclerc implements LetterNewsLetter {
 
-    private final String URL_NEWSLETTER_ELECLERK = "https://leclerc.pl/gazetki/";
+    private static final String URL_NEWSLETTER_ELECLERC = "https://www.gazetkipromocyjne.net/e-leclerc/";
+    private static final String TEST_URL = "https://www.gazetkipromocyjne.net/wp-content/uploads/pdf/29341__634d6751ba3a6.pdf";
 
     @Qualifier("firefoxDriver")
     private final WebDriver firefoxDriver;
 
-    public void fetchPDFFromWeb() throws AWTException, InterruptedException {
+    private final HttpClient httpClient;
 
-        System.setProperty("java.awt.headless", "false");
+    public void fetchPDFFromWeb() throws IOException, InterruptedException {
 
-        Robot robot = new Robot();
-        //disable headless environment in system
+        firefoxDriver.navigate().to(URL_NEWSLETTER_ELECLERC);
+        firefoxDriver.findElement(By.cssSelector(".newspapper-btn")).click();
+        firefoxDriver.findElement(By.cssSelector("a.newspapper-nav-item:nth-child(5)")).click();
 
-        firefoxDriver.navigate().to(URL_NEWSLETTER_ELECLERK);
-        Thread.sleep(5000L);
-        firefoxDriver.findElement(By.id("cookie_action_close_header")).click();
-        firefoxDriver.findElement(By.className("entry-content")).click();
-        Thread.sleep(3000L);
-        firefoxDriver.findElement(By.className("fa-print")).click();
-        Thread.sleep(3000L);
-        firefoxDriver.findElement(By.className("c-p")).click();
+        File myFile = new File("mystuff.bin");
 
-        String parentWindow = firefoxDriver.getWindowHandle();
-
-        Set<String> allWindows = firefoxDriver.getWindowHandles();
-        for (String curWindow : allWindows) {
-            firefoxDriver.switchTo().window(curWindow);
-            firefoxDriver.manage().window().maximize();
+        CloseableHttpClient client = HttpClients.createDefault();
+        try (CloseableHttpResponse response = client.execute(new HttpGet(TEST_URL))) {
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                try (FileOutputStream outstream = new FileOutputStream(myFile)) {
+                    entity.writeTo(outstream);
+                }
+            }
         }
-
-        firefoxDriver.manage().window().maximize();
-        Thread.sleep(6000L);
-        robot.keyPress(KeyEvent.VK_ENTER);
-
-        Thread.sleep(5000L);
-
-        robot.keyPress(KeyEvent.VK_F);
-        robot.keyPress(KeyEvent.VK_I);
-        robot.keyPress(KeyEvent.VK_L);
-        robot.keyPress(KeyEvent.VK_E);
-        robot.keyPress(KeyEvent.VK_1);
-        Thread.sleep(1000L);
-        robot.keyPress(KeyEvent.VK_ENTER);
-
-
-    /*    firefoxDriver.close();
-        firefoxDriver.switchTo().window(parentWindow);*/
     }
 
 }

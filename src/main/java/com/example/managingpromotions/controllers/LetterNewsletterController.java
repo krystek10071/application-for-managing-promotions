@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.awt.*;
+import java.io.IOException;
 
 @RestController
 @AllArgsConstructor
@@ -21,7 +22,7 @@ public class LetterNewsletterController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/eLeclerc")
-    public void letterNewsLetterEleclerc() throws AWTException, InterruptedException {
+    public void letterNewsLetterEleclerc() throws AWTException, InterruptedException, IOException {
         letterNewsletterServiceEleclerc.fetchPDFFromWeb();
     }
 
