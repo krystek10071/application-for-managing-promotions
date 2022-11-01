@@ -1,50 +1,64 @@
 package com.example.managingpromotions.services.newsletter;
 
 import lombok.AllArgsConstructor;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.http.HttpClient;
 
+@Slf4j
 @Service
 @AllArgsConstructor
-public class LetterNewsletterServiceEleclerc implements LetterNewsLetter {
+public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract implements LetterNewsLetter {
 
     private static final String URL_NEWSLETTER_ELECLERC = "https://www.gazetkipromocyjne.net/e-leclerc/";
     private static final String TEST_URL = "https://www.gazetkipromocyjne.net/wp-content/uploads/pdf/29341__634d6751ba3a6.pdf";
+    private static final String DESTINATION = "/eLeclerc";
 
-    @Qualifier("firefoxDriver")
     private final WebDriver firefoxDriver;
+    private final CloseableHttpClient httpClient;
+    private final LetterNewsLetterProperty letterNewsLetterProperty;
 
-    private final HttpClient httpClient;
-
-    public void fetchPDFFromWeb() throws IOException, InterruptedException {
-
+    @Override
+    public String fetchUrlToNewsLetterAddress(String urlNewsLetter) {
         firefoxDriver.navigate().to(URL_NEWSLETTER_ELECLERC);
         firefoxDriver.findElement(By.cssSelector(".newspapper-btn")).click();
         firefoxDriver.findElement(By.cssSelector("a.newspapper-nav-item:nth-child(5)")).click();
 
-        File myFile = new File("mystuff.bin");
+        //todo fetch URL from website
+        return TEST_URL;
+    }
 
-        CloseableHttpClient client = HttpClients.createDefault();
-        try (CloseableHttpResponse response = client.execute(new HttpGet(TEST_URL))) {
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                try (FileOutputStream outstream = new FileOutputStream(myFile)) {
-                    entity.writeTo(outstream);
-                }
+    public void fetchPDFFromWeb() throws IOException {
+
+        createDirectory(DESTINATION, letterNewsLetterProperty.getRootLocation());
+        String fullDestination = appendDestinationToRoot(DESTINATION, letterNewsLetterProperty.getRootLocation());
+
+        HttpGet request = new HttpGet(TEST_URL);
+        HttpResponse httpResponse = httpClient.execute(request);
+        HttpEntity httpEntity = httpResponse.getEntity();
+
+        //todo get pdfName
+        File myFile = new File(fullDestination + "/" + "pdfFile.pdf");
+        FileOutputStream fileOutputStream = new FileOutputStream(myFile);
+
+        if (httpEntity != null) {
+            try {
+                httpEntity.writeTo(fileOutputStream);
+            } catch (IOException e) {
+                log.error("Error in fetch newsletter Eleclerc");
             }
         }
+        fileOutputStream.close();
     }
+
 
 }

@@ -4,5 +4,7 @@ import java.io.IOException;
 
 public interface LetterNewsLetter {
 
-     void fetchPDFFromWeb() throws IOException, InterruptedException;
+    String fetchUrlToNewsLetterAddress(String urlNewsLetter);
+
+    void fetchPDFFromWeb() throws IOException, InterruptedException;
 }
