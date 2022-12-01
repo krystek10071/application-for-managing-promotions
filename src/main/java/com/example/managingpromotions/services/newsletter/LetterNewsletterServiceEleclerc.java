@@ -1,11 +1,15 @@
 package com.example.managingpromotions.services.newsletter;
 
+import com.example.managingpromotions.model.NewsletterFile;
+import com.example.managingpromotions.model.repository.NewsletterFileRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
@@ -13,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @Service
@@ -20,35 +26,26 @@ import java.io.IOException;
 public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract implements LetterNewsLetter {
 
     private static final String URL_NEWSLETTER_ELECLERC = "https://www.gazetkipromocyjne.net/e-leclerc/";
-    private static final String TEST_URL = "https://www.gazetkipromocyjne.net/wp-content/uploads/pdf/29341__634d6751ba3a6.pdf";
     private static final String DESTINATION = "/eLeclerc";
 
     private final WebDriver firefoxDriver;
     private final CloseableHttpClient httpClient;
     private final LetterNewsLetterProperty letterNewsLetterProperty;
+    private final NewsletterFileRepository newsletterFileRepository;
 
     @Override
-    public String fetchUrlToNewsLetterAddress(String urlNewsLetter) {
-        firefoxDriver.navigate().to(URL_NEWSLETTER_ELECLERC);
-        firefoxDriver.findElement(By.cssSelector(".newspapper-btn")).click();
-        firefoxDriver.findElement(By.cssSelector("a.newspapper-nav-item:nth-child(5)")).click();
-
-        //todo fetch URL from website
-        return TEST_URL;
-    }
-
     public void fetchPDFFromWeb() throws IOException {
 
         createDirectory(DESTINATION, letterNewsLetterProperty.getRootLocation());
         String fullDestination = appendDestinationToRoot(DESTINATION, letterNewsLetterProperty.getRootLocation());
 
-        HttpGet request = new HttpGet(TEST_URL);
+        HttpGet request = new HttpGet(fetchUrlToNewsLetterAddress(URL_NEWSLETTER_ELECLERC));
         HttpResponse httpResponse = httpClient.execute(request);
         HttpEntity httpEntity = httpResponse.getEntity();
 
-        //todo get pdfName
-        File myFile = new File(fullDestination + "/" + "pdfFile.pdf");
-        FileOutputStream fileOutputStream = new FileOutputStream(myFile);
+        String fileName = generateFileName();
+        File pdfFile = new File(fullDestination + "/" + fileName);
+        FileOutputStream fileOutputStream = new FileOutputStream(pdfFile);
 
         if (httpEntity != null) {
             try {
@@ -58,7 +55,33 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
             }
         }
         fileOutputStream.close();
+        createAndSaveEntityPdfFile(pdfFile);
     }
 
+    @Override
+    public String fetchUrlToNewsLetterAddress(String urlNewsLetter) {
+        firefoxDriver.navigate().to(URL_NEWSLETTER_ELECLERC);
+        firefoxDriver.findElement(By.cssSelector(".newspapper-btn")).click();
+
+        Document document = Jsoup.parse(firefoxDriver.getPageSource());
+        return document.select("a.newspapper-nav-item.newspapper-nav-download").attr("href");
+    }
+
+    private void createAndSaveEntityPdfFile(File pdfFile) {
+        NewsletterFile newsletterFile = NewsletterFile.builder()
+                .fileName(pdfFile.getName())
+                .path(pdfFile.getPath())
+                .dateFrom(LocalDate.now())
+                .dateTo(LocalDate.now())
+                .extension("pdf")
+                .build();
+
+        newsletterFileRepository.save(newsletterFile);
+    }
+
+    private String generateFileName() {
+        String date = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        return "newspapperEleclerk" + date + ".pdf";
+    }
 
 }

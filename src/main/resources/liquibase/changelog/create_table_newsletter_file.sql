@@ -3,7 +3,7 @@ CREATE TABLE newsletter_file
     id              BIGINT          NOT NULL,
     file_name       VARCHAR(50)     NOT NULL,
     path            VARCHAR(50)     NOT NULL,
-    extension       DATE            NOT NULL,
+    extension       VARCHAR(10)     NOT NULL,
     date_from       DATE,
     date_to         DATE,
     user_id         BIGINT,
