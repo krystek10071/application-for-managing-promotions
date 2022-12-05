@@ -4,12 +4,10 @@ CREATE TABLE newsletter_file
     file_name       VARCHAR(50)     NOT NULL,
     path            VARCHAR(50)     NOT NULL,
     extension       VARCHAR(10)     NOT NULL,
-    date_from       DATE,
-    date_to         DATE,
+    created_date    DATE,
     user_id         BIGINT,
 
-    CONSTRAINT newsletter_file_pk PRIMARY KEY (id),
-    CONSTRAINT newsletter_file_user_id_fk FOREIGN KEY (user_id) REFERENCES user_app (id)
+    CONSTRAINT newsletter_file_pk PRIMARY KEY (id)
 );
 
 CREATE SEQUENCE seq_newsletter_file

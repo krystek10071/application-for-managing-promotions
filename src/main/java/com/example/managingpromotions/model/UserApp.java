@@ -43,9 +43,4 @@ public class UserApp {
     @OneToMany(cascade = CascadeType.ALL,
             mappedBy = "userApp")
     private Set<FavouriteProduct> favouriteProducts;
-
-    @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "userApp", orphanRemoval = true)
-    @Fetch(FetchMode.JOIN)
-    private Set<NewsletterFile> newsletterFiles;
 }

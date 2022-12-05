@@ -42,13 +42,7 @@ public class NewsletterFile {
     @Column(name = "extension")
     private String extension;
 
-    @Column(name = "date_from")
-    private LocalDate dateFrom;
+    @Column(name = "created_date")
+    private LocalDate createdDate;
 
-    @Column(name = "date_to")
-    private LocalDate dateTo;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private UserApp userApp;
 }

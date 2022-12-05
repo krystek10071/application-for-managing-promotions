@@ -76,8 +76,6 @@ public class LetterNewsletterGroszekService extends LetterNewsLetterAbstract imp
         NewsletterFile newsletterFile = NewsletterFile.builder()
                 .fileName("fileName")
                 .path(pdfFile.getPath())
-                .dateFrom(LocalDate.now())
-                .dateTo(LocalDate.now())
                 .extension("pdf")
                 .build();
 

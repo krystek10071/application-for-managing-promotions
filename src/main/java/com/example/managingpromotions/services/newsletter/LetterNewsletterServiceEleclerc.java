@@ -55,7 +55,7 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
             }
         }
         fileOutputStream.close();
-        createAndSaveEntityPdfFile(pdfFile);
+        createAndSaveEntityPdfFile(pdfFile, fileName);
     }
 
     @Override
@@ -67,12 +67,12 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
         return document.select("a.newspapper-nav-item.newspapper-nav-download").attr("href");
     }
 
-    private void createAndSaveEntityPdfFile(File pdfFile) {
+    private void createAndSaveEntityPdfFile(File pdfFile, String fileName) {
+
         NewsletterFile newsletterFile = NewsletterFile.builder()
-                .fileName(pdfFile.getName())
+                .fileName(fileName)
                 .path(pdfFile.getPath())
-                .dateFrom(LocalDate.now())
-                .dateTo(LocalDate.now())
+                .createdDate(LocalDate.now())
                 .extension("pdf")
                 .build();
 
@@ -83,5 +83,4 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
         String date = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
         return "newspapperEleclerk" + date + ".pdf";
     }
-
 }
