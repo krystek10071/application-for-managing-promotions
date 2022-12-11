@@ -44,5 +44,4 @@ public class NewsletterFile {
 
     @Column(name = "created_date")
     private LocalDate createdDate;
-
 }

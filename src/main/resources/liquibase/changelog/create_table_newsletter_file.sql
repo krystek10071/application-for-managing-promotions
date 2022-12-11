@@ -5,7 +5,6 @@ CREATE TABLE newsletter_file
     path            VARCHAR(50)     NOT NULL,
     extension       VARCHAR(10)     NOT NULL,
     created_date    DATE,
-    user_id         BIGINT,
 
     CONSTRAINT newsletter_file_pk PRIMARY KEY (id)
 );

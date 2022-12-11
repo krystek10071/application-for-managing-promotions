@@ -1,5 +1,6 @@
 package com.example.managingpromotions.services.newsletter;
 
+import com.example.managingpromotions.exception.NewsletterFetchProcessException;
 import com.example.managingpromotions.model.NewsletterFile;
 import com.example.managingpromotions.model.repository.NewsletterFileRepository;
 import lombok.AllArgsConstructor;
@@ -60,8 +61,14 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
 
     @Override
     public String fetchUrlToNewsLetterAddress(String urlNewsLetter) {
-        firefoxDriver.navigate().to(URL_NEWSLETTER_ELECLERC);
-        firefoxDriver.findElement(By.cssSelector(".newspapper-btn")).click();
+
+        try {
+            firefoxDriver.navigate().to(URL_NEWSLETTER_ELECLERC);
+            firefoxDriver.findElement(By.cssSelector(".newspapper-btn")).click();
+        } catch (Exception e) {
+            String description = this.getClass() + "No find elements with newsletter";
+            throw new NewsletterFetchProcessException(description);
+        }
 
         Document document = Jsoup.parse(firefoxDriver.getPageSource());
         return document.select("a.newspapper-nav-item.newspapper-nav-download").attr("href");
