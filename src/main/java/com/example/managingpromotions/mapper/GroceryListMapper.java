@@ -1,7 +1,7 @@
 package com.example.managingpromotions.mapper;
 
-import com.example.managingpromotions.models.GroceryElement;
-import com.example.managingpromotions.models.GroceryList;
+import com.example.managingpromotions.model.GroceryElement;
+import com.example.managingpromotions.model.GroceryList;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

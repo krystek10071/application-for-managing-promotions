@@ -72,4 +72,14 @@
                  splitStatements="true"
                  stripComments="true"/>
     </changeSet>
+
+    <changeSet id="create_table_newsletter_file" author="krystian">
+        <sqlFile dbms="postgresql"
+                 encoding="utf8"
+                 endDelimiter=";"
+                 path="create_table_newsletter_file.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
 </databaseChangeLog>

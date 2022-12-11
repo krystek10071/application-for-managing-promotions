@@ -1,4 +1,4 @@
-package com.example.managingpromotions.models;
+package com.example.managingpromotions.model;
 
 
 import lombok.AllArgsConstructor;
