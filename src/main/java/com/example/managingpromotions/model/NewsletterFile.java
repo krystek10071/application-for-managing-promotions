@@ -5,14 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import pl.managingPromotions.api.model.ShopEnum;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import java.time.LocalDate;
 
@@ -44,4 +45,8 @@ public class NewsletterFile {
 
     @Column(name = "created_date")
     private LocalDate createdDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shop_name")
+    private ShopEnum shopName;
 }

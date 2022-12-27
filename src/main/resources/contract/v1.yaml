@@ -163,3 +163,16 @@ components:
           items:
             $ref: '#/components/schemas/ParsedProductDTO'
 
+    LetterNewsletterResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        shopName:
+          $ref: '#/components/schemas/ShopEnum'
+        fileName:
+          type: string
+        extension:
+          type: string
+

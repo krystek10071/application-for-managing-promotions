@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
+import pl.managingPromotions.api.model.ShopEnum;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,6 +79,7 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
 
         NewsletterFile newsletterFile = NewsletterFile.builder()
                 .fileName(fileName)
+                .shopName(ShopEnum.ELECLERC)
                 .path(pdfFile.getPath())
                 .createdDate(LocalDate.now())
                 .extension("pdf")
