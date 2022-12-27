@@ -13,6 +13,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
+import pl.managingPromotions.api.model.ShopEnum;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -81,6 +82,7 @@ public class LetterNewsletterGroszekService extends LetterNewsLetterAbstract imp
         NewsletterFile newsletterFile = NewsletterFile.builder()
                 .fileName("fileName")
                 .path(pdfFile.getPath())
+                .shopName(ShopEnum.GROSZEK)
                 .extension("pdf")
                 .build();
 

@@ -5,6 +5,7 @@ CREATE TABLE newsletter_file
     path            VARCHAR(50)     NOT NULL,
     extension       VARCHAR(10)     NOT NULL,
     created_date    DATE,
+    shop_name       VARCHAR(10)     NOT NULL,
 
     CONSTRAINT newsletter_file_pk PRIMARY KEY (id)
 );
