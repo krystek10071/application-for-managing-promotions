@@ -15,20 +15,19 @@ import pl.managingPromotions.api.model.UserAppResponseDTO;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "api/v1/accountdsds")
+@RequestMapping
 public class AccountController {
 
     private final AccountService accountService;
 
     @PostMapping(value = "/login")
-    public ResponseEntity<Void> login(@RequestBody final LoginCredentials credentials) {
-        return new ResponseEntity<>(null, HttpStatus.OK);
+    public void login(@RequestBody final LoginCredentials credentials) {
     }
 
-    @PostMapping(value = "/registration")
+/*    @PostMapping(value = "/registration")
     public ResponseEntity<UserAppResponseDTO> registration(@RequestBody final RegistrationCredentials registrationCredentials) {
 
         UserAppResponseDTO userAppResponseDTO = accountService.createUserAccount(registrationCredentials);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
-    }
+    }*/
 }
