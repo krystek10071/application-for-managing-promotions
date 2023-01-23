@@ -49,6 +49,9 @@ components:
           format: date
 
     LoginCredentials:
+      required:
+        - username
+        - password
       type: object
       properties:
         username:
@@ -176,3 +179,19 @@ components:
         extension:
           type: string
 
+    RegistrationCredentials:
+      required:
+        - passwordConfirmation
+      allOf:
+        - $ref: '#/components/schemas/LoginCredentials'
+        - type: object
+          properties:
+            passwordConfirmation:
+              type: string
+
+    UserAppResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64

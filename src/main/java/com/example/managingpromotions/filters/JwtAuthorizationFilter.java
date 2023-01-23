@@ -17,40 +17,47 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
+
     private static final String TOKEN_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
     private final UserDetailsService userDetailsService;
     private final String secret;
-
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDetailsService userDetailsService,
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
+                                  UserDetailsService userDetailsService,
                                   String secret) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
         this.secret = secret;
     }
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws IOException, ServletException {
+
         UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
 
+        if (authentication == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        chain.doFilter(request, response);
+        filterChain.doFilter(request, response);
     }
-
-
-
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+
         String token = request.getHeader(TOKEN_HEADER);
-        if(token !=null && token.startsWith(TOKEN_PREFIX)){
-           String username = JWT.require(Algorithm.HMAC256(secret))
+
+        if (token != null && token.startsWith(TOKEN_PREFIX)) {
+
+            String userName = JWT.require(Algorithm.HMAC256(secret))
                     .build()
                     .verify(token.replace(TOKEN_PREFIX, ""))
                     .getSubject();
 
-
-            if(username!=null){
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
+            if (userName != null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+                return new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
+                        null, userDetails.getAuthorities());
             }
         }
         return null;

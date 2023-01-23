@@ -39,4 +39,13 @@ public class GlobalExceptionHandler {
 
         return ErrorResponseUtils.createErrorResponse(HttpStatus.NOT_FOUND.value(), description, description);
     }
+
+    @ExceptionHandler(DataValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDataValidationException(DataValidationException ex) {
+        String description = ex.getMessage();
+        log.error(description);
+
+        return ErrorResponseUtils.createErrorResponse(HttpStatus.NOT_FOUND.value(), description, description);
+    }
 }
