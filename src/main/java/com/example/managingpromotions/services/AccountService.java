@@ -7,6 +7,7 @@ import com.example.managingpromotions.model.enums.RoleUserEnum;
 import com.example.managingpromotions.model.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.managingPromotions.api.model.RegistrationCredentials;
@@ -26,9 +27,15 @@ public class AccountService {
 
         credentialsValidation(registrationCredentials);
 
+        if (!checkUserIfExist(registrationCredentials)) {
+            throw new DataValidationException("the username: " + registrationCredentials.getUsername() + " is already exist");
+        }
+
+        String encryptedPassword = "{bcrypt}" + new BCryptPasswordEncoder().encode(registrationCredentials.getPassword());
+
         UserApp userApp = UserApp.builder()
                 .username(registrationCredentials.getUsername())
-                .password(registrationCredentials.getPassword())
+                .password(encryptedPassword)
                 .role(RoleUserEnum.USER)
                 .isEnabled(true)
                 .build();
@@ -38,6 +45,12 @@ public class AccountService {
 
         return userAppMapper.mapUserAppToUserAppMapper(userApp);
     }
+
+    private boolean checkUserIfExist(RegistrationCredentials credentials) {
+
+        return userRepository.findByUsername(credentials.getUsername()).isPresent();
+    }
+
 
     private void credentialsValidation(RegistrationCredentials credentials) {
 

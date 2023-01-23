@@ -24,10 +24,10 @@ public class AccountController {
     public void login(@RequestBody final LoginCredentials credentials) {
     }
 
-/*    @PostMapping(value = "/registration")
+    @PostMapping(value = "/registration")
     public ResponseEntity<UserAppResponseDTO> registration(@RequestBody final RegistrationCredentials registrationCredentials) {
 
         UserAppResponseDTO userAppResponseDTO = accountService.createUserAccount(registrationCredentials);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
-    }*/
+    }
 }
