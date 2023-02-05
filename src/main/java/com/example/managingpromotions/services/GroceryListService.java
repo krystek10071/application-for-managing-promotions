@@ -85,5 +85,4 @@ public class GroceryListService {
             groceryElement.setGroceryList(groceryList);
         });
     }
-
 }

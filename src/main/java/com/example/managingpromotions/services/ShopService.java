@@ -3,7 +3,9 @@ package com.example.managingpromotions.services;
 import com.example.managingpromotions.exception.ResourceNotFoundException;
 import com.example.managingpromotions.mapper.GroceryListMapper;
 import com.example.managingpromotions.mapper.ProductMapper;
+import com.example.managingpromotions.model.GroceryElement;
 import com.example.managingpromotions.model.GroceryList;
+import com.example.managingpromotions.model.Product;
 import com.example.managingpromotions.model.repository.GroceryListRepository;
 import com.example.managingpromotions.services.shopParser.AuchanParser;
 import com.example.managingpromotions.services.shopParser.CarrefourParser;
@@ -12,10 +14,24 @@ import com.example.managingpromotions.services.shopParser.GroszekParser;
 import lombok.AllArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
-import pl.managingPromotions.api.model.*;
+import org.springframework.transaction.annotation.Transactional;
+import pl.managingPromotions.api.model.CheapestShoppingReponse;
+import pl.managingPromotions.api.model.GroceryListProductDTO;
+import pl.managingPromotions.api.model.ParsedProductDTO;
+import pl.managingPromotions.api.model.ProductDTO;
+import pl.managingPromotions.api.model.ProductParsedFromShopDTO;
+import pl.managingPromotions.api.model.ShopEnum;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,8 +46,43 @@ public class ShopService {
     private final GroceryListMapper groceryListMapper;
     private final GroceryListRepository groceryListRepository;
 
-    public List<ProductParsedFromShopDTO> getCheapestShop(Long groceryListId) throws InterruptedException {
+    @Transactional
+    public void parseProductsFromShops(Long groceryListId) {
+
+        GroceryList groceryList = groceryListRepository.findById(groceryListId)
+                .orElseThrow(() -> new ResourceNotFoundException("Grocery list with id: " + groceryListId + " not found"));
+
+        Set<GroceryElement> syncGroceryElements = Collections.synchronizedSet(groceryList.getGroceryElements());
+
+        Thread thread1 = new Thread(() -> {
+            synchronized (syncGroceryElements) {
+                syncGroceryElements.forEach(groceryElement -> {
+
+                    ProductParsedFromShopDTO parsedFromShopDTO = fetchDataFromEleclerc(groceryElement);
+                    saveProduct(parsedFromShopDTO, groceryList);
+                });
+            }
+        });
+
+        CompletableFuture.runAsync(thread1);
+
+    }
+
+    private void saveProduct(ProductParsedFromShopDTO parsedFromShopDTO, GroceryList groceryList) {
+
+        Product product;
+    }
+
+
+    @Transactional
+    public List<ProductParsedFromShopDTO> getCheapestShop(Long groceryListId) {
+
+        //todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo
+        parseProductsFromShops(groceryListId);
+
+        // todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo
         List<ProductParsedFromShopDTO> productParsedFromShopDTOS = Collections.synchronizedList(new ArrayList<>());
+
         Optional<GroceryList> groceryList = groceryListRepository.findById(groceryListId);
 
         List<GroceryListProductDTO> groceryListProductDTOS = groceryListMapper.mapSetGroceryElementToGroceryListProductDTO(
@@ -40,14 +91,12 @@ public class ShopService {
 
         List<GroceryListProductDTO> groceryListProductDTOSSynchronized = Collections.synchronizedList(groceryListProductDTOS);
 
-        //todo thread
-
-        Thread thread1 = new Thread(() -> {
+        /*        Thread thread1 = new Thread(() -> {
             synchronized (groceryListProductDTOSSynchronized) {
                 groceryListProductDTOSSynchronized.forEach(
                         productDTO -> productParsedFromShopDTOS.add(fetchDataFromEleclerc(productDTO, groceryListId)));
             }
-        });
+        });*/
 
 /*        Thread thread2 = new Thread(() -> {
             synchronized (groceryListProductDTOSSynchronized) {
@@ -63,14 +112,14 @@ public class ShopService {
             }
         });*/
 
-        Thread thread4 = new Thread(() -> {
+/*        Thread thread4 = new Thread(() -> {
             synchronized (groceryListProductDTOSSynchronized) {
                 groceryListProductDTOSSynchronized.forEach(
                         productDTO -> productParsedFromShopDTOS.add(fetchDataFromGroszek(productDTO, groceryListId)));
             }
-        });
+        });*/
 
-        thread1.start();
+/*        thread1.start();
         //  thread2.start();
         //  thread3.start();
         thread4.start();
@@ -78,7 +127,7 @@ public class ShopService {
         thread1.join();
         //  thread2.join();
         //  thread3.join();
-        thread4.join();
+        thread4.join();*/
     /*    thread2.start();
         thread3.start();
         thread4.start();*/
@@ -99,20 +148,20 @@ public class ShopService {
         return productParsedFromShopDTOS;
     }
 
-    private ProductParsedFromShopDTO fetchDataFromEleclerc(GroceryListProductDTO groceryListProductDTO, Long groceryListId) {
-        Document document = eleclercParser.fetchDataFromWeb(groceryListProductDTO.getName());
+    private ProductParsedFromShopDTO fetchDataFromEleclerc(GroceryElement groceryElement) {
+
+        Document document = eleclercParser.fetchDataFromWeb(groceryElement.getName());
 
         ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
 
-        productParsedFromShopDTO.setGroceryListId(groceryListId);
         productParsedFromShopDTO.setShopName(ShopEnum.ELECLERC.getValue());
 
         List<ProductDTO> productDTOS = checkProductDTOSize(eleclercParser.prepareData(document));
         List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
 
         parsedProductDTOS.forEach(productParsedDTO -> {
-            productParsedDTO.setUnit(groceryListProductDTO.getUnit());
-            productParsedDTO.amount(groceryListProductDTO.getAmount());
+            productParsedDTO.setUnit(groceryElement.getUnit());
+            productParsedDTO.amount(Integer.valueOf(String.valueOf(groceryElement.getAmount())));
         });
 
         productParsedFromShopDTO.setProducts(parsedProductDTOS);

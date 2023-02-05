@@ -15,8 +15,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Service("eleclercParser")
+
 @AllArgsConstructor
+@Service("eleclercParser")
 public class EleclercParser implements IParser {
 
     private static final String URL_SHOP_PREFIX = "https://leclercdrive.lublin.pl/szukaj?controller=search&orderby=position&orderway=desc&search_query=";
@@ -45,16 +46,11 @@ public class EleclercParser implements IParser {
                 product.setProductName(findProductNameInDocument(row));
                 product.setPrice(new BigDecimal(findPriceProduct(row)));
                 product.setDescription(findProductDescription(row));
-                /*   product.setLinkToImage(findLinkToImage(row));*/
 
                 listProductDTO.add(product);
             }
         }
         return listProductDTO;
-    }
-
-    private String findLinkToImage(Element row) {
-        return row.select("#center_column > ul > li:nth-child(1) > div > div.left-block > div > a > img").text();
     }
 
     private String findProductDescription(Element row) {
@@ -79,5 +75,4 @@ public class EleclercParser implements IParser {
     private String findProductNameInDocument(Element row) {
         return row.select("a.product-name").text();
     }
-
 }

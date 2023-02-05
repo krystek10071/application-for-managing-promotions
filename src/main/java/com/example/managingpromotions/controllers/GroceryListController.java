@@ -3,6 +3,7 @@ package com.example.managingpromotions.controllers;
 
 import com.example.managingpromotions.services.GroceryListService;
 import com.example.managingpromotions.services.ShopService;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -58,7 +59,8 @@ public class GroceryListController {
     }
 
     @GetMapping(value = "/{groceryList}/product-shop")
-    List<ProductParsedFromShopDTO> getTheCheapestShop(@RequestParam Long groceryListId) throws InterruptedException {
+    @ApiOperation(value = "Get cheapest shop")
+    List<ProductParsedFromShopDTO> getTheCheapestShop(@RequestParam Long groceryListId) {
         return shopService.getCheapestShop(groceryListId);
     }
 }

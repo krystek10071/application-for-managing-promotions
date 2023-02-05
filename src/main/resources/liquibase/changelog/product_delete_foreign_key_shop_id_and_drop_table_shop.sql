@@ -1,0 +1,3 @@
+ALTER TABLE product DROP CONSTRAINT product_shop_id_fk;
+DROP TABLE shop;
+ALTER TABLE product ADD COLUMN shop_name VARCHAR(50) NOT NULL;
