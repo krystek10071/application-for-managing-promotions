@@ -28,7 +28,7 @@ import javax.persistence.Table;
 @Table(name = "product")
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "grocery_list")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_product")
     @SequenceGenerator(
             name = "seq_product",
             sequenceName = "seq_product",

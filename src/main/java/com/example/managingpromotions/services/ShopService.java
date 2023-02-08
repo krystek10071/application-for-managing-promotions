@@ -5,13 +5,14 @@ import com.example.managingpromotions.mapper.GroceryListMapper;
 import com.example.managingpromotions.mapper.ProductMapper;
 import com.example.managingpromotions.model.GroceryElement;
 import com.example.managingpromotions.model.GroceryList;
-import com.example.managingpromotions.model.Product;
+import com.example.managingpromotions.model.repository.GroceryElementRepository;
 import com.example.managingpromotions.model.repository.GroceryListRepository;
 import com.example.managingpromotions.services.shopParser.AuchanParser;
 import com.example.managingpromotions.services.shopParser.CarrefourParser;
 import com.example.managingpromotions.services.shopParser.EleclercParser;
 import com.example.managingpromotions.services.shopParser.GroszekParser;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ShopService {
@@ -45,6 +46,7 @@ public class ShopService {
     private final CarrefourParser carrefourParser;
     private final GroceryListMapper groceryListMapper;
     private final GroceryListRepository groceryListRepository;
+    private final GroceryElementRepository groceryElementRepository;
 
     @Transactional
     public void parseProductsFromShops(Long groceryListId) {
@@ -52,25 +54,35 @@ public class ShopService {
         GroceryList groceryList = groceryListRepository.findById(groceryListId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grocery list with id: " + groceryListId + " not found"));
 
+        //todo todo todo todo todo todo todo todo
         Set<GroceryElement> syncGroceryElements = Collections.synchronizedSet(groceryList.getGroceryElements());
 
         Thread thread1 = new Thread(() -> {
             synchronized (syncGroceryElements) {
                 syncGroceryElements.forEach(groceryElement -> {
-
                     ProductParsedFromShopDTO parsedFromShopDTO = fetchDataFromEleclerc(groceryElement);
-                    saveProduct(parsedFromShopDTO, groceryList);
+                    saveProduct(parsedFromShopDTO, groceryElement);
                 });
             }
         });
 
-        CompletableFuture.runAsync(thread1);
+        //CompletableFuture.runAsync(thread1);
+        thread1.start();
+
+        // todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo
 
     }
 
-    private void saveProduct(ProductParsedFromShopDTO parsedFromShopDTO, GroceryList groceryList) {
+    @Transactional
+    private void saveProduct(ProductParsedFromShopDTO parsedFromShopDTO, GroceryElement groceryElement) {
 
-        Product product;
+        //todo change enum value
+        groceryElement.addAllProducts(productMapper.mapListParsedProductDTOToListProduct(parsedFromShopDTO.getProducts()));
+        groceryElement.getParsedProducts().forEach(product -> {
+            product.setShopName(ShopEnum.ELECLERC);
+        });
+
+        groceryElementRepository.save(groceryElement);
     }
 
 
@@ -161,7 +173,7 @@ public class ShopService {
 
         parsedProductDTOS.forEach(productParsedDTO -> {
             productParsedDTO.setUnit(groceryElement.getUnit());
-            productParsedDTO.amount(Integer.valueOf(String.valueOf(groceryElement.getAmount())));
+            productParsedDTO.amount(groceryElement.getAmount());
         });
 
         productParsedFromShopDTO.setProducts(parsedProductDTOS);
@@ -305,7 +317,7 @@ public class ShopService {
         final BigDecimal[] totalPrices = {new BigDecimal("0.00")};
 
         parsedProductDTOS.forEach(parsedProductDTO -> {
-            BigDecimal bigDecimal = parsedProductDTO.getPrice().multiply(BigDecimal.valueOf(parsedProductDTO.getAmount()));
+            BigDecimal bigDecimal = parsedProductDTO.getPrice().multiply(parsedProductDTO.getAmount());
 
             totalPrices[0] = totalPrices[0].add(bigDecimal);
         });

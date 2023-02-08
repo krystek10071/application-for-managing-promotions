@@ -19,6 +19,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -45,13 +47,20 @@ public class GroceryElement {
     private String unit;
 
     @Column(name = "amount")
-    private Double amount;
+    private BigDecimal amount;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "groceryElement")
     @Fetch(FetchMode.JOIN)
-    private List<Product> parsedProducts;
+    private List<Product> parsedProducts = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grocery_list_id", referencedColumnName = "id")
     private GroceryList groceryList;
+
+    public void addAllProducts(List<Product> products) {
+        products.forEach(product -> {
+            product.setGroceryElement(this);
+            parsedProducts.add(product);
+        });
+    }
 }
