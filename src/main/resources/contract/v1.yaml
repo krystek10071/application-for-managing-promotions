@@ -133,7 +133,7 @@ components:
       type: object
       properties:
         shopName:
-          type: string
+          $ref: '#/components/schemas/ShopEnum'
         groceryListId:
           type: integer
           format: int64

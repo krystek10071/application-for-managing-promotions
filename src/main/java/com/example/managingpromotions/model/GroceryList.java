@@ -37,6 +37,9 @@ public class GroceryList {
     @Column(name = "modifyDate")
     private LocalDate modifyDate;
 
+    @Column(name = "is_processed")
+    private Boolean isProcessed;
+
     @OneToMany(cascade = CascadeType.ALL,
             mappedBy = "groceryList")
     @Fetch(FetchMode.JOIN)

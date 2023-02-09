@@ -7,6 +7,7 @@ import com.example.managingpromotions.model.GroceryElement;
 import com.example.managingpromotions.model.GroceryList;
 import com.example.managingpromotions.model.repository.GroceryElementRepository;
 import com.example.managingpromotions.model.repository.GroceryListRepository;
+import com.example.managingpromotions.model.repository.ProductRepository;
 import com.example.managingpromotions.services.shopParser.AuchanParser;
 import com.example.managingpromotions.services.shopParser.CarrefourParser;
 import com.example.managingpromotions.services.shopParser.EleclercParser;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -45,6 +47,7 @@ public class ShopService {
     private final EleclercParser eleclercParser;
     private final CarrefourParser carrefourParser;
     private final GroceryListMapper groceryListMapper;
+    private final ProductRepository productRepository;
     private final GroceryListRepository groceryListRepository;
     private final GroceryElementRepository groceryElementRepository;
 
@@ -54,8 +57,17 @@ public class ShopService {
         GroceryList groceryList = groceryListRepository.findById(groceryListId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grocery list with id: " + groceryListId + " not found"));
 
-        //todo todo todo todo todo todo todo todo
+        clearParsedProductsForGrocerList(groceryList);
         Set<GroceryElement> syncGroceryElements = Collections.synchronizedSet(groceryList.getGroceryElements());
+
+        invokeParserForEleclerc(syncGroceryElements);
+        invokeParserForGroszek(syncGroceryElements);
+
+        //groceryList.setIsProcessed(true);
+        // todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo
+    }
+
+    private void invokeParserForEleclerc(Set<GroceryElement> syncGroceryElements) {
 
         Thread thread1 = new Thread(() -> {
             synchronized (syncGroceryElements) {
@@ -66,25 +78,43 @@ public class ShopService {
             }
         });
 
-        //CompletableFuture.runAsync(thread1);
-        thread1.start();
+        CompletableFuture.runAsync(thread1);
+    }
 
-        // todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo
+    private void invokeParserForGroszek(Set<GroceryElement> syncGroceryElements) {
 
+        Thread thread = new Thread(() -> {
+            synchronized (syncGroceryElements) {
+                syncGroceryElements.forEach(groceryElement -> {
+                    ProductParsedFromShopDTO parsedFromShopDTO = fetchDataFromGroszek(groceryElement);
+                    saveProduct(parsedFromShopDTO, groceryElement);
+                });
+            }
+        });
+
+        CompletableFuture.runAsync(thread);
+    }
+
+
+    private void clearParsedProductsForGrocerList(GroceryList groceryList) {
+
+        Set<GroceryElement> groceryElements = groceryList.getGroceryElements();
+
+        groceryElements.forEach(groceryElement -> {
+                    productRepository.deleteAll(groceryElement.getParsedProducts());
+                }
+        );
+        log.info("Deleted products for grocery list with id: {}", groceryList.getId());
     }
 
     @Transactional
     private void saveProduct(ProductParsedFromShopDTO parsedFromShopDTO, GroceryElement groceryElement) {
 
-        //todo change enum value
         groceryElement.addAllProducts(productMapper.mapListParsedProductDTOToListProduct(parsedFromShopDTO.getProducts()));
-        groceryElement.getParsedProducts().forEach(product -> {
-            product.setShopName(ShopEnum.ELECLERC);
-        });
+        groceryElement.getParsedProducts().forEach(product -> product.setShopName(parsedFromShopDTO.getShopName()));
 
         groceryElementRepository.save(groceryElement);
     }
-
 
     @Transactional
     public List<ProductParsedFromShopDTO> getCheapestShop(Long groceryListId) {
@@ -165,10 +195,29 @@ public class ShopService {
         Document document = eleclercParser.fetchDataFromWeb(groceryElement.getName());
 
         ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
-
-        productParsedFromShopDTO.setShopName(ShopEnum.ELECLERC.getValue());
+        productParsedFromShopDTO.setShopName(ShopEnum.ELECLERC);
 
         List<ProductDTO> productDTOS = checkProductDTOSize(eleclercParser.prepareData(document));
+        List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
+
+        parsedProductDTOS.forEach(productParsedDTO -> {
+            productParsedDTO.setUnit(groceryElement.getUnit());
+            productParsedDTO.amount(groceryElement.getAmount());
+        });
+
+        productParsedFromShopDTO.setProducts(parsedProductDTOS);
+
+        return productParsedFromShopDTO;
+    }
+
+    private ProductParsedFromShopDTO fetchDataFromGroszek(GroceryElement groceryElement) {
+
+        Document document = groszekParser.fetchDataFromWeb(groceryElement.getName());
+
+        ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
+        productParsedFromShopDTO.setShopName(ShopEnum.GROSZEK);
+
+        List<ProductDTO> productDTOS = checkProductDTOSize(groszekParser.prepareData(document));
         List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
 
         parsedProductDTOS.forEach(productParsedDTO -> {
@@ -187,7 +236,7 @@ public class ShopService {
         ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
 
         productParsedFromShopDTO.setGroceryListId(groceryListId);
-        productParsedFromShopDTO.setShopName(ShopEnum.AUCHAN.getValue());
+        productParsedFromShopDTO.setShopName(ShopEnum.AUCHAN);
 
         List<ProductDTO> productDTOS = checkProductDTOSize(auchanParser.prepareData(document));
         List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
@@ -208,7 +257,7 @@ public class ShopService {
         ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
 
         productParsedFromShopDTO.setGroceryListId(groceryListId);
-        productParsedFromShopDTO.setShopName(ShopEnum.CARREFOUR.getValue());
+        productParsedFromShopDTO.setShopName(ShopEnum.CARREFOUR);
 
         List<ProductDTO> productDTOS = checkProductDTOSize(carrefourParser.prepareData(document));
         List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
@@ -223,26 +272,6 @@ public class ShopService {
         return productParsedFromShopDTO;
     }
 
-    private ProductParsedFromShopDTO fetchDataFromGroszek(GroceryListProductDTO groceryListProductDTO, Long groceryListId) {
-        Document document = groszekParser.fetchDataFromWeb(groceryListProductDTO.getName());
-
-        ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
-
-        productParsedFromShopDTO.setGroceryListId(groceryListId);
-        productParsedFromShopDTO.setShopName(ShopEnum.GROSZEK.getValue());
-
-        List<ProductDTO> productDTOS = checkProductDTOSize(groszekParser.prepareData(document));
-        List<ParsedProductDTO> parsedProductDTOS = productMapper.mapListProductDTOToListParsedProductDTO(productDTOS);
-
-        parsedProductDTOS.forEach(productParsedDTO -> {
-            productParsedDTO.setUnit(groceryListProductDTO.getUnit());
-            productParsedDTO.amount(groceryListProductDTO.getAmount());
-        });
-
-        productParsedFromShopDTO.setProducts(parsedProductDTOS);
-
-        return productParsedFromShopDTO;
-    }
 
     private List<ProductDTO> checkProductDTOSize(List<ProductDTO> productDTOS) {
 
@@ -277,7 +306,7 @@ public class ShopService {
 
         List<ProductParsedFromShopDTO> productsParsedAfterConvert = new ArrayList<>();
 
-        List<String> shopNamesFromResponse = productParsedFromShopDTOS.stream()
+        List<ShopEnum> shopNamesFromResponse = productParsedFromShopDTOS.stream()
                 .map(ProductParsedFromShopDTO::getShopName)
                 .distinct()
                 .collect(Collectors.toList());
@@ -305,7 +334,7 @@ public class ShopService {
     private CheapestShoppingReponse createCheapestShoppingResponse(ProductParsedFromShopDTO productParsedFromShopDTO,
                                                                    BigDecimal totalPrice) {
         return CheapestShoppingReponse.builder()
-                .shopName(productParsedFromShopDTO.getShopName())
+                .shopName(productParsedFromShopDTO.getShopName().getValue())
                 .groceryListId(productParsedFromShopDTO.getGroceryListId())
                 .products(productParsedFromShopDTO.getProducts())
                 .price(totalPrice)
