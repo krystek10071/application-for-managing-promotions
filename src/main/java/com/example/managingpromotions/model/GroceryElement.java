@@ -49,7 +49,7 @@ public class GroceryElement {
     @Column(name = "amount")
     private BigDecimal amount;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "groceryElement")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "groceryElement")
     @Fetch(FetchMode.JOIN)
     private List<Product> parsedProducts = new ArrayList<>();
 

@@ -58,13 +58,21 @@ public class ShopService {
                 .orElseThrow(() -> new ResourceNotFoundException("Grocery list with id: " + groceryListId + " not found"));
 
         clearParsedProductsForGrocerList(groceryList);
+
         Set<GroceryElement> syncGroceryElements = Collections.synchronizedSet(groceryList.getGroceryElements());
+        invokeProductsParsers(syncGroceryElements, groceryList);
+    }
+
+    private void invokeProductsParsers(Set<GroceryElement> syncGroceryElements, GroceryList groceryList) {
 
         invokeParserForEleclerc(syncGroceryElements);
-        invokeParserForGroszek(syncGroceryElements);
+        invokeParserForGroszek(syncGroceryElements, groceryList);
+    }
 
-        //groceryList.setIsProcessed(true);
-        // todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo todo
+    private void setProcessedGroceryList(GroceryList groceryList) {
+
+        groceryList.setIsProcessed(true);
+        groceryListRepository.save(groceryList);
     }
 
     private void invokeParserForEleclerc(Set<GroceryElement> syncGroceryElements) {
@@ -81,7 +89,7 @@ public class ShopService {
         CompletableFuture.runAsync(thread1);
     }
 
-    private void invokeParserForGroszek(Set<GroceryElement> syncGroceryElements) {
+    private void invokeParserForGroszek(Set<GroceryElement> syncGroceryElements, GroceryList groceryList) {
 
         Thread thread = new Thread(() -> {
             synchronized (syncGroceryElements) {
@@ -89,21 +97,19 @@ public class ShopService {
                     ProductParsedFromShopDTO parsedFromShopDTO = fetchDataFromGroszek(groceryElement);
                     saveProduct(parsedFromShopDTO, groceryElement);
                 });
+
+                setProcessedGroceryList(groceryList);
             }
         });
 
         CompletableFuture.runAsync(thread);
     }
 
-
     private void clearParsedProductsForGrocerList(GroceryList groceryList) {
 
         Set<GroceryElement> groceryElements = groceryList.getGroceryElements();
+        groceryElements.forEach(groceryElement -> groceryElement.getParsedProducts().clear());
 
-        groceryElements.forEach(groceryElement -> {
-                    productRepository.deleteAll(groceryElement.getParsedProducts());
-                }
-        );
         log.info("Deleted products for grocery list with id: {}", groceryList.getId());
     }
 
