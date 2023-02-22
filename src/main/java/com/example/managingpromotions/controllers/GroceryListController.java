@@ -3,7 +3,7 @@ package com.example.managingpromotions.controllers;
 
 import com.example.managingpromotions.services.GroceryListService;
 import com.example.managingpromotions.services.ShopService;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,16 +36,20 @@ public class GroceryListController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create new grocery list")
     public CreateIdResponse createGroceryList(@RequestBody GroceryListRequestDTO groceryListRequestDTO) {
         return groceryListService.createGroceryList(groceryListRequestDTO);
     }
 
+
     @GetMapping(value = "/{userName}")
     @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get grocery lists assigned to user")
     public List<GroceryListResponseDTO> getGroceryLists(@PathVariable String userName) {
         return groceryListService.getGroceryListForUser(userName);
     }
 
+    @Operation(summary = "Modify created grocery list")
     @PatchMapping(value = "/{groceryListId}")
     @ResponseStatus(HttpStatus.OK)
     public void modifyGroceryList(@RequestParam long groceryListId, @RequestBody GroceryListModifyRequestDTO groceryListModifyRequestDTO) {
@@ -54,13 +58,14 @@ public class GroceryListController {
 
     @DeleteMapping(value = "/{groceryListId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete grocery list")
     public void deleteGroceryList(@RequestParam long groceryListId) {
         groceryListService.deleteGroceryList(groceryListId);
     }
 
     @GetMapping(value = "/{groceryList}/product-shop")
-    @ApiOperation(value = "Get cheapest shop")
-    List<ProductParsedFromShopDTO> getTheCheapestShop(@RequestParam Long groceryListId) {
-        return shopService.getCheapestShop(groceryListId);
+    @Operation(summary = "Get parsed products from shops")
+    List<ProductParsedFromShopDTO> getParsedProductsFromShops(@RequestParam Long groceryListId) {
+        return shopService.getParsedProductsFromShops(groceryListId);
     }
 }
