@@ -1,5 +1,6 @@
 package com.example.managingpromotions.mapper;
 
+import com.example.managingpromotions.model.Product;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,7 +14,12 @@ import java.util.List;
 public interface ProductMapper {
 
     @Mapping(source = "productName", target = "name")
-    ParsedProductDTO mapProductDTOSToParsedProductDTO(ProductDTO productDTO );
+    ParsedProductDTO mapProductDTOSToParsedProductDTO(ProductDTO productDTO);
 
     List<ParsedProductDTO> mapListProductDTOToListParsedProductDTO(List<ProductDTO> productDTOS);
+
+    List<Product> mapListParsedProductDTOToListProduct(List<ParsedProductDTO> parsedProductDTOS);
+
+    @Mapping(source = "name", target = "productName")
+    Product mapParsedProductDTOToProduct(ParsedProductDTO parsedProductDTO);
 }

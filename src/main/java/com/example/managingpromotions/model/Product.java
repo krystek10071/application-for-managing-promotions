@@ -5,10 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.managingPromotions.api.model.ShopEnum;
 
-import javax.persistence.*;
-import java.util.Date;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 @Entity
 @Getter
@@ -18,7 +28,7 @@ import java.util.Set;
 @Table(name = "product")
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "grocery_list")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_product")
     @SequenceGenerator(
             name = "seq_product",
             sequenceName = "seq_product",
@@ -35,24 +45,11 @@ public class Product {
     @Column(name = "price")
     private double price;
 
-    @Column(name = "category")
-    private String category;
-
-    @Column(name = "expiry_date")
-    private Date expiryDate;
-
-    @Column(name = "link_to_image")
-    private String linkToImage;
-
-    @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "product")
-    private Set<FavouriteProduct> favouriteProducts;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shop_name")
+    private ShopEnum shopName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id", referencedColumnName = "id")
-    private Shop shop;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private CategoryDictionary categoryDictionary;
+    @JoinColumn(name = "grocery_element_id", referencedColumnName = "id")
+    private GroceryElement groceryElement;
 }

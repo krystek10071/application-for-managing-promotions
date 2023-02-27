@@ -74,7 +74,7 @@ components:
         unit:
           type: string
         amount:
-          type: int
+          type: number
 
     GroceryListRequestDTO:
       type: object
@@ -125,7 +125,7 @@ components:
         unit:
           type: string
         amount:
-          type: int
+          type: number
         price:
           type: number
 
@@ -133,7 +133,7 @@ components:
       type: object
       properties:
         shopName:
-          type: string
+          $ref: '#/components/schemas/ShopEnum'
         groceryListId:
           type: integer
           format: int64

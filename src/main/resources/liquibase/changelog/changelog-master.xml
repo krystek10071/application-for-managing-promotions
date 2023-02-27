@@ -82,4 +82,44 @@
                  splitStatements="true"
                  stripComments="true"/>
     </changeSet>
+
+    <changeSet id="products_add_grocery_element_id_column_and_set_foreign_key" author="krystian">
+        <sqlFile dbms="postgresql"
+                 encoding="utf8"
+                 endDelimiter=";"
+                 path="products_add_grocery_element_id_column_and_set_foreign_key.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="product_delete_foreign_key_category_dictionary" author="krystian">
+        <sqlFile dbms="postgresql"
+                 encoding="utf8"
+                 endDelimiter=";"
+                 path="product_delete_foreign_key_category_dictionary.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="product_delete_foreign_key_shop_id_and_drop_table_shop" author="krystian">
+        <sqlFile dbms="postgresql"
+                 encoding="utf8"
+                 endDelimiter=";"
+                 path="product_delete_foreign_key_shop_id_and_drop_table_shop.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="grocery_list_add_column_is_processed" author="krystian">
+        <sqlFile dbms="postgresql"
+                 encoding="utf8"
+                 endDelimiter=";"
+                 path="grocery_list_add_column_is_processed.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
 </databaseChangeLog>

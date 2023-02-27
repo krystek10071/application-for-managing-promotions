@@ -1,0 +1,1 @@
+ALTER TABLE product DROP CONSTRAINT product_category_id_fk;

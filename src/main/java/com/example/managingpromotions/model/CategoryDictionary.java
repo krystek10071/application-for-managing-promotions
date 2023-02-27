@@ -28,7 +28,4 @@ public class CategoryDictionary {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL,
-            mappedBy = "categoryDictionary")
-    private Set<Product> products;
 }
