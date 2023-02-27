@@ -5,6 +5,7 @@ import com.example.managingpromotions.mapper.GroceryListMapper;
 import com.example.managingpromotions.mapper.ProductMapper;
 import com.example.managingpromotions.model.GroceryElement;
 import com.example.managingpromotions.model.GroceryList;
+import com.example.managingpromotions.model.Product;
 import com.example.managingpromotions.model.repository.GroceryElementRepository;
 import com.example.managingpromotions.model.repository.GroceryListRepository;
 import com.example.managingpromotions.model.repository.ProductRepository;
@@ -50,7 +51,6 @@ public class ShopService {
     private final GroceryListRepository groceryListRepository;
     private final GroceryElementRepository groceryElementRepository;
 
-    @Transactional
     public void parseProductsFromShops(Long groceryListId) {
 
         GroceryList groceryList = groceryListRepository.findById(groceryListId)
@@ -62,30 +62,40 @@ public class ShopService {
         invokeProductsParsers(syncGroceryElements, groceryList);
     }
 
+    @Transactional
     private void invokeProductsParsers(Set<GroceryElement> syncGroceryElements, GroceryList groceryList) {
 
-        invokeParserForEleclerc(syncGroceryElements);
-        invokeParserForGroszek(syncGroceryElements, groceryList);
-    }
-
-    private void setProcessedGroceryList(GroceryList groceryList) {
-
-        groceryList.setIsProcessed(true);
-        groceryListRepository.save(groceryList);
-    }
-
-    private void invokeParserForEleclerc(Set<GroceryElement> syncGroceryElements) {
-
-        Thread thread1 = new Thread(() -> {
+        Thread threadProductParser = new Thread(() -> {
             synchronized (syncGroceryElements) {
                 syncGroceryElements.forEach(groceryElement -> {
-                    ProductParsedFromShopDTO parsedFromShopDTO = fetchDataFromEleclerc(groceryElement);
-                    saveProduct(parsedFromShopDTO, groceryElement);
+
+                    List<Product> productsToSave = new ArrayList<>();
+
+
+                    List<Product> productsToSaveFromEleclerc = invokeParserForEleclerc(groceryElement);
+
+
+                    ProductParsedFromShopDTO parsedProductFromEleclerc = fetchDataFromEleclerc(groceryElement);
+                    ProductParsedFromShopDTO parsedProductFromGroszek = fetchDataFromGroszek(groceryElement);
+
+                    productsToSave.addAll(mapParsedProductToProduct(parsedProductFromEleclerc));
+                    productsToSave.addAll(mapParsedProductToProduct(parsedProductFromGroszek));
+
+                    groceryElement.addAllProducts(productsToSave);
+                 //   groceryElementRepository.save(groceryElement);
                 });
             }
+
+            groceryList.setIsProcessed(true);
+            groceryListRepository.save(groceryList);
+          //  groceryElementRepository.save(groceryElement);
         });
 
-        CompletableFuture.runAsync(thread1);
+        CompletableFuture.runAsync(threadProductParser);
+    }
+
+    private List<Product> invokeParserForEleclerc(GroceryElement syncGroceryElements) {
+        return null;
     }
 
     private void invokeParserForGroszek(Set<GroceryElement> syncGroceryElements, GroceryList groceryList) {
@@ -94,16 +104,17 @@ public class ShopService {
             synchronized (syncGroceryElements) {
                 syncGroceryElements.forEach(groceryElement -> {
                     ProductParsedFromShopDTO parsedFromShopDTO = fetchDataFromGroszek(groceryElement);
-                    saveProduct(parsedFromShopDTO, groceryElement);
+                    mapParsedProductToProduct(parsedFromShopDTO);
                 });
 
-                setProcessedGroceryList(groceryList);
+               // setProcessedGroceryList(groceryList);
             }
         });
 
         CompletableFuture.runAsync(thread);
     }
 
+    @Transactional
     private void clearParsedProductsForGrocerList(GroceryList groceryList) {
 
         Set<GroceryElement> groceryElements = groceryList.getGroceryElements();
@@ -113,12 +124,12 @@ public class ShopService {
     }
 
     @Transactional
-    private void saveProduct(ProductParsedFromShopDTO parsedFromShopDTO, GroceryElement groceryElement) {
+    private List<Product> mapParsedProductToProduct(ProductParsedFromShopDTO parsedFromShopDTO) {
 
-        groceryElement.addAllProducts(productMapper.mapListParsedProductDTOToListProduct(parsedFromShopDTO.getProducts()));
-        groceryElement.getParsedProducts().forEach(product -> product.setShopName(parsedFromShopDTO.getShopName()));
+        List<Product> productsToSave = productMapper.mapListParsedProductDTOToListProduct(parsedFromShopDTO.getProducts());
+        productsToSave.forEach(product -> product.setShopName(parsedFromShopDTO.getShopName()));
 
-        groceryElementRepository.save(groceryElement);
+        return productsToSave;
     }
 
     @Transactional
@@ -128,7 +139,7 @@ public class ShopService {
                 .orElseThrow(() -> new ResourceNotFoundException("Grocery List with id: " + groceryListId + " not found"));
 
 
-        //parseProductsFromShops(groceryListId);
+        parseProductsFromShops(groceryListId);
         return Collections.emptyList();
     }
 
