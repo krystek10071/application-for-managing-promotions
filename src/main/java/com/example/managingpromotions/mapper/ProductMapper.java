@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import pl.managingPromotions.api.model.ParsedProductDTO;
 import pl.managingPromotions.api.model.ProductDTO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper(componentModel = "spring",
@@ -22,4 +23,8 @@ public interface ProductMapper {
 
     @Mapping(source = "name", target = "productName")
     Product mapParsedProductDTOToProduct(ParsedProductDTO parsedProductDTO);
+
+    @Mapping(target = "name", source = "product.productName")
+    @Mapping(target = "price", source = "product.price")
+    ParsedProductDTO mapProductToParseProductDTO(Product product, String unit, BigDecimal amount);
 }

@@ -41,6 +41,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ShopService {
 
+    private static final List<ShopEnum> SHOP_ENUMS = List.of(ShopEnum.ELECLERC, ShopEnum.GROSZEK);
+
     private final AuchanParser auchanParser;
     private final GroszekParser groszekParser;
     private final ProductMapper productMapper;
@@ -84,6 +86,48 @@ public class ShopService {
         CompletableFuture.runAsync(threadProductParser);
     }
 
+    @Transactional
+    public List<ProductParsedFromShopDTO> getParsedProductsFromShops(Long groceryListId) {
+
+        //todo todo M-040
+        GroceryList groceryList = groceryListRepository.findById(groceryListId)
+                .orElseThrow(() -> new ResourceNotFoundException("Grocery List with id: " + groceryListId + " not found"));
+
+        List<ProductParsedFromShopDTO> products = new ArrayList<>();
+
+        groceryList.getGroceryElements()
+                .forEach(groceryElement -> {
+
+                    SHOP_ENUMS.forEach(shopEnum -> {
+
+                        List<Product> parsedProduct = groceryElement.getParsedProducts().stream()
+                                .filter(product -> product.getShopName().equals(shopEnum))
+                                .collect(Collectors.toList());
+
+                        List<ParsedProductDTO> parsedProductDTOList = new ArrayList<>();
+
+
+                        parsedProduct.forEach(product -> {
+                            ParsedProductDTO parsedProductDTO = productMapper.mapProductToParseProductDTO(
+                                    product, groceryElement.getUnit(), groceryElement.getAmount());
+
+                            parsedProductDTOList.add(parsedProductDTO);
+                        });
+
+
+                        ProductParsedFromShopDTO productParsedFromShopDTO = ProductParsedFromShopDTO.builder()
+                                .products(parsedProductDTOList)
+                                .shopName(shopEnum)
+                                .build();
+
+                        products.add(productParsedFromShopDTO);
+                    });
+                });
+
+
+        return products;
+    }
+
     private List<Product> invokeParserForEleclerc(GroceryElement groceryElement) {
 
         ProductParsedFromShopDTO parsedProductFromEleclerc = fetchDataFromEleclerc(groceryElement);
@@ -112,16 +156,6 @@ public class ShopService {
         productsToSave.forEach(product -> product.setShopName(parsedFromShopDTO.getShopName()));
 
         return productsToSave;
-    }
-
-    @Transactional
-    public List<ProductParsedFromShopDTO> getParsedProductsFromShops(Long groceryListId) {
-
-        //todo todo
-        GroceryList groceryList = groceryListRepository.findById(groceryListId)
-                .orElseThrow(() -> new ResourceNotFoundException("Grocery List with id: " + groceryListId + " not found"));
-
-        return Collections.emptyList();
     }
 
     private ProductParsedFromShopDTO fetchDataFromEleclerc(GroceryElement groceryElement) {
