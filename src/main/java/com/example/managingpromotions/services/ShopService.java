@@ -1,5 +1,6 @@
 package com.example.managingpromotions.services;
 
+import com.example.managingpromotions.exception.DataValidationException;
 import com.example.managingpromotions.exception.ResourceNotFoundException;
 import com.example.managingpromotions.mapper.GroceryListMapper;
 import com.example.managingpromotions.mapper.ProductMapper;
@@ -89,41 +90,19 @@ public class ShopService {
     @Transactional
     public List<ProductParsedFromShopDTO> getParsedProductsFromShops(Long groceryListId) {
 
-        //todo todo M-040
         GroceryList groceryList = groceryListRepository.findById(groceryListId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grocery List with id: " + groceryListId + " not found"));
 
+        validateGroceryList(groceryList);
         List<ProductParsedFromShopDTO> products = new ArrayList<>();
 
         groceryList.getGroceryElements()
-                .forEach(groceryElement -> {
+                .forEach(groceryElement -> SHOP_ENUMS.forEach(shopEnum -> {
+                    List<ParsedProductDTO> parsedProductDTOList =
+                            productMapper.mapProductListToParsedProductDTOList(groceryElement, shopEnum);
 
-                    SHOP_ENUMS.forEach(shopEnum -> {
-
-                        List<Product> parsedProduct = groceryElement.getParsedProducts().stream()
-                                .filter(product -> product.getShopName().equals(shopEnum))
-                                .collect(Collectors.toList());
-
-                        List<ParsedProductDTO> parsedProductDTOList = new ArrayList<>();
-
-
-                        parsedProduct.forEach(product -> {
-                            ParsedProductDTO parsedProductDTO = productMapper.mapProductToParseProductDTO(
-                                    product, groceryElement.getUnit(), groceryElement.getAmount());
-
-                            parsedProductDTOList.add(parsedProductDTO);
-                        });
-
-
-                        ProductParsedFromShopDTO productParsedFromShopDTO = ProductParsedFromShopDTO.builder()
-                                .products(parsedProductDTOList)
-                                .shopName(shopEnum)
-                                .build();
-
-                        products.add(productParsedFromShopDTO);
-                    });
-                });
-
+                    products.add(createProductParsedFromShopDTO(parsedProductDTOList, shopEnum));
+                }));
 
         return products;
     }
@@ -324,5 +303,20 @@ public class ShopService {
 
     private Map.Entry<String, BigDecimal> choseCheapestShop(Map<String, BigDecimal> valuesOfPurchasesFromShop) {
         return Collections.min(valuesOfPurchasesFromShop.entrySet(), Map.Entry.comparingByValue());
+    }
+
+    private void validateGroceryList(GroceryList groceryList) {
+        if(groceryList.getIsProcessed() == null || !groceryList.getIsProcessed()){
+            throw new DataValidationException("The shopping list has not yet been processed");
+        }
+    }
+
+    private ProductParsedFromShopDTO createProductParsedFromShopDTO(
+            List<ParsedProductDTO> parsedProductDTOList, ShopEnum shopEnum) {
+
+        return ProductParsedFromShopDTO.builder()
+                .products(parsedProductDTOList)
+                .shopName(shopEnum)
+                .build();
     }
 }
