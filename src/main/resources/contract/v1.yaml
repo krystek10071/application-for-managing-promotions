@@ -181,6 +181,15 @@ components:
         extension:
           type: string
 
+    LetterNewsletterDTO:
+      allOf:
+        - $ref: '#/components/schemas/LetterNewsletterResponseDTO'
+        - type: object
+          properties:
+            file:
+              type: string
+              format: base64
+
     RegistrationCredentials:
       required:
         - passwordConfirmation

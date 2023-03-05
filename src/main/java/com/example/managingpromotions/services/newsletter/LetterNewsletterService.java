@@ -1,10 +1,13 @@
 package com.example.managingpromotions.services.newsletter;
 
+import com.example.managingpromotions.exception.ResourceNotFoundException;
+import com.example.managingpromotions.mapper.LetterNewsLetterMapper;
 import com.example.managingpromotions.model.NewsletterFile;
 import com.example.managingpromotions.model.repository.NewsletterFileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.managingPromotions.api.model.LetterNewsletterDTO;
 import pl.managingPromotions.api.model.LetterNewsletterResponseDTO;
 import pl.managingPromotions.api.model.ShopEnum;
 
@@ -21,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LetterNewsletterService {
 
+    private final LetterNewsLetterMapper letterNewsLetterMapper;
     private final NewsletterFileRepository newsletterFileRepository;
 
 
@@ -36,6 +40,15 @@ public class LetterNewsletterService {
         });
 
         return letterNewsletterResponseDTOS;
+    }
+
+    public LetterNewsletterDTO getNewsLetter(Long id) {
+
+        NewsletterFile newsletterFile = newsletterFileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Grocery list with id: " + id + " not found"));
+
+        String pdfInBase64 = generatePdfInBase64(newsletterFile);
+        return letterNewsLetterMapper.mapNewsLetterFileToLetterNewsletterDTO(newsletterFile, pdfInBase64);
     }
 
     private LetterNewsletterResponseDTO createLetterNewsletterDTO(NewsletterFile newsletterFile) {
