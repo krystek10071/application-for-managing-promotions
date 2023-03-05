@@ -134,6 +134,8 @@ components:
       properties:
         shopName:
           $ref: '#/components/schemas/ShopEnum'
+        productFromGroceryList:
+          type: string
         groceryListId:
           type: integer
           format: int64

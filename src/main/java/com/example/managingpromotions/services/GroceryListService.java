@@ -26,12 +26,13 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GroceryListService {
 
+    private final ShopService shopService;
     private final UserRepository userRepository;
     private final GroceryListMapper groceryListMapper;
     private final GroceryListRepository groceryListRepository;
     private final GroceryElementRepository groceryElementRepository;
 
-    @Transactional()
+    @Transactional
     public CreateIdResponse createGroceryList(GroceryListRequestDTO groceryListRequestDTO) {
         Optional<UserApp> user = userRepository.findByUsername(groceryListRequestDTO.getUserLogin());
 
@@ -43,6 +44,8 @@ public class GroceryListService {
         assignGroceryElementToGroceryList(groceryList);
 
         final GroceryList savedGroceryList = groceryListRepository.saveAndFlush(groceryList);
+
+        shopService.parseProductsFromShops(savedGroceryList.getId());
 
         return CreateIdResponse.builder()
                 .id(savedGroceryList.getId())
@@ -81,8 +84,6 @@ public class GroceryListService {
     }
 
     private void assignGroceryElementToGroceryList(GroceryList groceryList) {
-        groceryList.getGroceryElements().forEach(groceryElement -> {
-            groceryElement.setGroceryList(groceryList);
-        });
+        groceryList.getGroceryElements().forEach(groceryElement -> groceryElement.setGroceryList(groceryList));
     }
 }

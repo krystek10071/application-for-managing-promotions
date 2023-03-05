@@ -1,5 +1,6 @@
 package com.example.managingpromotions.services;
 
+import com.example.managingpromotions.exception.DataValidationException;
 import com.example.managingpromotions.exception.ResourceNotFoundException;
 import com.example.managingpromotions.mapper.GroceryListMapper;
 import com.example.managingpromotions.mapper.ProductMapper;
@@ -40,6 +41,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ShopService {
+
+    private static final List<ShopEnum> SHOP_ENUMS = List.of(ShopEnum.ELECLERC, ShopEnum.GROSZEK);
 
     private final AuchanParser auchanParser;
     private final GroszekParser groszekParser;
@@ -84,6 +87,26 @@ public class ShopService {
         CompletableFuture.runAsync(threadProductParser);
     }
 
+    @Transactional
+    public List<ProductParsedFromShopDTO> getParsedProductsFromShops(Long groceryListId) {
+
+        GroceryList groceryList = groceryListRepository.findById(groceryListId)
+                .orElseThrow(() -> new ResourceNotFoundException("Grocery List with id: " + groceryListId + " not found"));
+
+        validateGroceryList(groceryList);
+        List<ProductParsedFromShopDTO> products = new ArrayList<>();
+
+        groceryList.getGroceryElements()
+                .forEach(groceryElement -> SHOP_ENUMS.forEach(shopEnum -> {
+                    List<ParsedProductDTO> parsedProductDTOList =
+                            productMapper.mapProductListToParsedProductDTOList(groceryElement, shopEnum);
+
+                    products.add(createProductParsedFromShopDTO(parsedProductDTOList, shopEnum, groceryElement));
+                }));
+
+        return products;
+    }
+
     private List<Product> invokeParserForEleclerc(GroceryElement groceryElement) {
 
         ProductParsedFromShopDTO parsedProductFromEleclerc = fetchDataFromEleclerc(groceryElement);
@@ -112,16 +135,6 @@ public class ShopService {
         productsToSave.forEach(product -> product.setShopName(parsedFromShopDTO.getShopName()));
 
         return productsToSave;
-    }
-
-    @Transactional
-    public List<ProductParsedFromShopDTO> getParsedProductsFromShops(Long groceryListId) {
-
-        //todo todo
-        GroceryList groceryList = groceryListRepository.findById(groceryListId)
-                .orElseThrow(() -> new ResourceNotFoundException("Grocery List with id: " + groceryListId + " not found"));
-
-        return Collections.emptyList();
     }
 
     private ProductParsedFromShopDTO fetchDataFromEleclerc(GroceryElement groceryElement) {
@@ -190,7 +203,6 @@ public class ShopService {
 
         ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
 
-        productParsedFromShopDTO.setGroceryListId(groceryListId);
         productParsedFromShopDTO.setShopName(ShopEnum.CARREFOUR);
 
         List<ProductDTO> productDTOS = checkProductDTOSize(carrefourParser.prepareData(document));
@@ -210,7 +222,7 @@ public class ShopService {
     private List<ProductDTO> checkProductDTOSize(List<ProductDTO> productDTOS) {
 
         if (productDTOS.size() >= 4) {
-            return productDTOS.subList(0, 4);
+            return productDTOS.subList(0, 8);
         }
         return productDTOS;
     }
@@ -290,5 +302,21 @@ public class ShopService {
 
     private Map.Entry<String, BigDecimal> choseCheapestShop(Map<String, BigDecimal> valuesOfPurchasesFromShop) {
         return Collections.min(valuesOfPurchasesFromShop.entrySet(), Map.Entry.comparingByValue());
+    }
+
+    private void validateGroceryList(GroceryList groceryList) {
+        if (groceryList.getIsProcessed() == null || !groceryList.getIsProcessed()) {
+            throw new DataValidationException("The shopping list has not yet been processed");
+        }
+    }
+
+    private ProductParsedFromShopDTO createProductParsedFromShopDTO(
+            List<ParsedProductDTO> parsedProductDTOList, ShopEnum shopEnum, GroceryElement groceryElement) {
+
+        return ProductParsedFromShopDTO.builder()
+                .products(parsedProductDTOList)
+                .productFromGroceryList(groceryElement.getName())
+                .shopName(shopEnum)
+                .build();
     }
 }
