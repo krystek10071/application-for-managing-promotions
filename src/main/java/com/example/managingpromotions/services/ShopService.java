@@ -101,7 +101,7 @@ public class ShopService {
                     List<ParsedProductDTO> parsedProductDTOList =
                             productMapper.mapProductListToParsedProductDTOList(groceryElement, shopEnum);
 
-                    products.add(createProductParsedFromShopDTO(parsedProductDTOList, shopEnum));
+                    products.add(createProductParsedFromShopDTO(parsedProductDTOList, shopEnum, groceryElement));
                 }));
 
         return products;
@@ -203,7 +203,6 @@ public class ShopService {
 
         ProductParsedFromShopDTO productParsedFromShopDTO = new ProductParsedFromShopDTO();
 
-        productParsedFromShopDTO.setGroceryListId(groceryListId);
         productParsedFromShopDTO.setShopName(ShopEnum.CARREFOUR);
 
         List<ProductDTO> productDTOS = checkProductDTOSize(carrefourParser.prepareData(document));
@@ -223,7 +222,7 @@ public class ShopService {
     private List<ProductDTO> checkProductDTOSize(List<ProductDTO> productDTOS) {
 
         if (productDTOS.size() >= 4) {
-            return productDTOS.subList(0, 4);
+            return productDTOS.subList(0, 8);
         }
         return productDTOS;
     }
@@ -306,16 +305,17 @@ public class ShopService {
     }
 
     private void validateGroceryList(GroceryList groceryList) {
-        if(groceryList.getIsProcessed() == null || !groceryList.getIsProcessed()){
+        if (groceryList.getIsProcessed() == null || !groceryList.getIsProcessed()) {
             throw new DataValidationException("The shopping list has not yet been processed");
         }
     }
 
     private ProductParsedFromShopDTO createProductParsedFromShopDTO(
-            List<ParsedProductDTO> parsedProductDTOList, ShopEnum shopEnum) {
+            List<ParsedProductDTO> parsedProductDTOList, ShopEnum shopEnum, GroceryElement groceryElement) {
 
         return ProductParsedFromShopDTO.builder()
                 .products(parsedProductDTOList)
+                .productFromGroceryList(groceryElement.getName())
                 .shopName(shopEnum)
                 .build();
     }
