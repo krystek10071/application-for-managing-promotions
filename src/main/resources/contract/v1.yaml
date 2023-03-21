@@ -167,6 +167,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ParsedProductDTO'
+        unSelectedProducts:
+          type: array
+          items:
+            type: string
 
     LetterNewsletterResponseDTO:
       type: object
@@ -197,3 +201,13 @@ components:
         id:
           type: integer
           format: int64
+
+    ShopWithProducts:
+      type: object
+      properties:
+        shopName:
+          $ref: '#/components/schemas/ShopEnum'
+        unselectedProducts:
+          type: array
+          items:
+            type: string

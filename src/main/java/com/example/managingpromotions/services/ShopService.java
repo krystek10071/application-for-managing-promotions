@@ -25,6 +25,7 @@ import pl.managingPromotions.api.model.ParsedProductDTO;
 import pl.managingPromotions.api.model.ProductDTO;
 import pl.managingPromotions.api.model.ProductParsedFromShopDTO;
 import pl.managingPromotions.api.model.ShopEnum;
+import pl.managingPromotions.api.model.ShopWithProducts;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -221,7 +222,7 @@ public class ShopService {
 
     private List<ProductDTO> checkProductDTOSize(List<ProductDTO> productDTOS) {
 
-        if (productDTOS.size() >= 4) {
+        if (productDTOS.size() >= 8) {
             return productDTOS.subList(0, 8);
         }
         return productDTOS;
@@ -229,7 +230,9 @@ public class ShopService {
 
     public List<CheapestShoppingReponse> findCheapestProduct(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
 
+        //List of stores with selected products
         List<ProductParsedFromShopDTO> convertedProductParsedFromShop = prepareData(productParsedFromShopDTOS);
+        List<ShopWithProducts> unselectedProductFromGroceryLists = findUnselectedProductsFromGroceryList(productParsedFromShopDTOS);
 
         List<CheapestShoppingReponse> cheapestShoppingResponseDTO = new ArrayList<>();
 
@@ -237,8 +240,12 @@ public class ShopService {
                 productParsedFromShopDTO -> {
                     List<ParsedProductDTO> parsedProductDTOS = productParsedFromShopDTO.getProducts();
                     BigDecimal totalPrice = calculateTotalPrice(parsedProductDTOS);
+                    List<String> unselectedProductFromGroceryList = getUnselectedProductsForShopName(
+                            unselectedProductFromGroceryLists, productParsedFromShopDTO.getShopName());
 
-                    CheapestShoppingReponse cheapestShoppingReponse = createCheapestShoppingResponse(productParsedFromShopDTO, totalPrice);
+                    CheapestShoppingReponse cheapestShoppingReponse = createCheapestShoppingResponse(
+                            productParsedFromShopDTO, totalPrice, unselectedProductFromGroceryList);
+
                     cheapestShoppingResponseDTO.add(cheapestShoppingReponse);
                 }
         );
@@ -248,14 +255,20 @@ public class ShopService {
         return cheapestShoppingResponseDTO;
     }
 
+    private List<String> getUnselectedProductsForShopName(List<ShopWithProducts> unselectedProductFromGroceryLists,
+                                                          ShopEnum shopName) {
+
+        return unselectedProductFromGroceryLists.stream()
+                .filter(unselectedProduct -> unselectedProduct.getShopName().equals(shopName))
+                .map(ShopWithProducts::getUnselectedProducts)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
+
     private List<ProductParsedFromShopDTO> prepareData(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
 
         List<ProductParsedFromShopDTO> productsParsedAfterConvert = new ArrayList<>();
-
-        List<ShopEnum> shopNamesFromResponse = productParsedFromShopDTOS.stream()
-                .map(ProductParsedFromShopDTO::getShopName)
-                .distinct()
-                .collect(Collectors.toList());
+        List<ShopEnum> shopNamesFromResponse = findShopNames(productParsedFromShopDTOS);
 
         shopNamesFromResponse.forEach(shopName -> {
 
@@ -274,15 +287,50 @@ public class ShopService {
         });
 
         return productsParsedAfterConvert;
+    }
 
+    private List<ShopWithProducts> findUnselectedProductsFromGroceryList(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
+
+        List<ShopWithProducts> shopWithProducts = new ArrayList<>();
+        List<ShopEnum> shopNamesFromResponse = findShopNames(productParsedFromShopDTOS);
+
+        shopNamesFromResponse.forEach(shopName -> {
+
+            List<String> unselectedProductsFromGroceryList = productParsedFromShopDTOS.stream()
+                    .filter(productParsedFromShopDTO -> productParsedFromShopDTO.getShopName().equals(shopName) &&
+                            productParsedFromShopDTO.getProducts().isEmpty())
+                    .map(ProductParsedFromShopDTO::getProductFromGroceryList)
+                    .collect(Collectors.toList());
+
+            ShopWithProducts shopWithProduct = createShopWithProducts(unselectedProductsFromGroceryList, shopName);
+            shopWithProducts.add(shopWithProduct);
+        });
+
+        return shopWithProducts;
+    }
+
+    private ShopWithProducts createShopWithProducts(List<String> unselectedProductsFromGroceryList, ShopEnum shopName) {
+        return ShopWithProducts.builder()
+                .shopName(shopName)
+                .unselectedProducts(unselectedProductsFromGroceryList)
+                .build();
+    }
+
+    private List<ShopEnum> findShopNames(List<ProductParsedFromShopDTO> productParsedFromShopDTOS) {
+
+        return productParsedFromShopDTOS.stream()
+                .map(ProductParsedFromShopDTO::getShopName)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private CheapestShoppingReponse createCheapestShoppingResponse(ProductParsedFromShopDTO productParsedFromShopDTO,
-                                                                   BigDecimal totalPrice) {
+                                                                   BigDecimal totalPrice, List<String> unselectedProductFromGroceryList) {
         return CheapestShoppingReponse.builder()
                 .shopName(productParsedFromShopDTO.getShopName().getValue())
                 .groceryListId(productParsedFromShopDTO.getGroceryListId())
                 .products(productParsedFromShopDTO.getProducts())
+                .unSelectedProducts(unselectedProductFromGroceryList)
                 .price(totalPrice)
                 .build();
     }
