@@ -222,7 +222,7 @@ public class ShopService {
 
     private List<ProductDTO> checkProductDTOSize(List<ProductDTO> productDTOS) {
 
-        if (productDTOS.size() >= 4) {
+        if (productDTOS.size() >= 8) {
             return productDTOS.subList(0, 8);
         }
         return productDTOS;
