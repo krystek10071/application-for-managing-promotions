@@ -7,9 +7,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import pl.managingPromotions.api.model.LetterNewsletterFileDTO;
 import pl.managingPromotions.api.model.LetterNewsletterResponseDTO;
 
 import java.io.IOException;
@@ -42,5 +44,12 @@ public class LetterNewsletterController {
     public List<LetterNewsletterResponseDTO> getAllNewspapers() {
 
         return letterNewsletterService.getAllNewsletters();
+    }
+
+    @GetMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation("Get newsletter for id")
+    public LetterNewsletterFileDTO getNewsletter(@PathVariable Long id) {
+        return letterNewsletterService.getNewsletterById(id);
     }
 }
