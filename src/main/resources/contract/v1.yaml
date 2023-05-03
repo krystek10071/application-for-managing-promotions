@@ -185,6 +185,22 @@ components:
         extension:
           type: string
 
+    LetterNewsletterFileDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        shopName:
+          $ref: '#/components/schemas/ShopEnum'
+        fileName:
+          type: string
+        extension:
+          type: string
+        file:
+          type: string
+          format: base64
+
     RegistrationCredentials:
       required:
         - passwordConfirmation
