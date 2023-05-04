@@ -1,6 +1,5 @@
 package com.example.managingpromotions.services.newsletter;
 
-import com.example.managingpromotions.exception.NewsletterFetchProcessException;
 import com.example.managingpromotions.model.NewsletterFile;
 import com.example.managingpromotions.model.repository.NewsletterFileRepository;
 import lombok.AllArgsConstructor;
@@ -9,11 +8,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.managingPromotions.api.model.NewsletterFromWebDTO;
 import pl.managingPromotions.api.model.ShopEnum;
 
 import java.io.File;
@@ -36,12 +34,14 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
     private final NewsletterFileRepository newsletterFileRepository;
 
     @Override
+    @Transactional
     public void fetchPDFFromWeb() throws IOException {
 
         createDirectory(DESTINATION, letterNewsLetterProperty.getRootLocation());
         String fullDestination = appendDestinationToRoot(DESTINATION, letterNewsLetterProperty.getRootLocation());
 
-        HttpGet request = new HttpGet(fetchUrlToNewsLetterAddress(URL_NEWSLETTER_ELECLERC));
+        NewsletterFromWebDTO newsletterFromWebDTO = fetchNewsletterDataFromWeb(firefoxDriver, URL_NEWSLETTER_ELECLERC);
+        HttpGet request = new HttpGet(newsletterFromWebDTO.getUrlToDownload());
         HttpResponse httpResponse = httpClient.execute(request);
         HttpEntity httpEntity = httpResponse.getEntity();
 
@@ -57,31 +57,20 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
             }
         }
         fileOutputStream.close();
-        createAndSaveEntityPdfFile(pdfFile, fileName);
+        createAndSaveEntityPdfFile(pdfFile, fileName, newsletterFromWebDTO);
     }
 
-    @Override
-    public String fetchUrlToNewsLetterAddress(String urlNewsLetter) {
+    private void createAndSaveEntityPdfFile(File pdfFile, String fileName, NewsletterFromWebDTO newsletterFromWebDTO) {
 
-        try {
-            firefoxDriver.navigate().to(URL_NEWSLETTER_ELECLERC);
-            firefoxDriver.findElement(By.cssSelector(".newspapper-btn")).click();
-        } catch (Exception e) {
-            String description = this.getClass() + "No find elements with newsletter";
-            throw new NewsletterFetchProcessException(description);
-        }
-
-        Document document = Jsoup.parse(firefoxDriver.getPageSource());
-        return document.select("a.newspapper-nav-item.newspapper-nav-download").attr("href");
-    }
-
-    private void createAndSaveEntityPdfFile(File pdfFile, String fileName) {
+        LocalDate[] datesStartAndEnd = getDateRange(newsletterFromWebDTO.getDate());
 
         NewsletterFile newsletterFile = NewsletterFile.builder()
                 .fileName(fileName)
                 .shopName(ShopEnum.ELECLERC)
                 .path(pdfFile.getPath())
                 .createdDate(LocalDate.now())
+                .starDate(datesStartAndEnd[0])
+                .endDate(datesStartAndEnd[1])
                 .extension("pdf")
                 .build();
 

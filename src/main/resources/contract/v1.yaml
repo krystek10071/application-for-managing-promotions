@@ -227,3 +227,11 @@ components:
           type: array
           items:
             type: string
+
+    NewsletterFromWebDTO:
+         type: object
+         properties:
+           urlToDownload:
+             type: string
+           date:
+             type: string

@@ -1,6 +1,5 @@
 package com.example.managingpromotions.services.newsletter;
 
-import com.example.managingpromotions.exception.NewsletterFetchProcessException;
 import com.example.managingpromotions.model.NewsletterFile;
 import com.example.managingpromotions.model.repository.NewsletterFileRepository;
 import com.example.managingpromotions.model.repository.UserRepository;
@@ -10,9 +9,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.managingPromotions.api.model.NewsletterFromWebDTO;
 import pl.managingPromotions.api.model.ShopEnum;
 
 import java.io.File;
@@ -27,7 +27,6 @@ import java.time.format.DateTimeFormatter;
 public class LetterNewsletterGroszekService extends LetterNewsLetterAbstract implements LetterNewsLetter {
 
     private final String URL_NEWSLETTER_GROSZEK = "https://www.gazetkipromocyjne.net/groszek/";
-    private static final String TEST_URL = "https://www.gazetkipromocyjne.net/wp-content/uploads/pdf/29341__634d6751ba3a6.pdf";
     private static final String DESTINATION = "/groszek";
 
     private final WebDriver firefoxDriver;
@@ -38,51 +37,43 @@ public class LetterNewsletterGroszekService extends LetterNewsLetterAbstract imp
     private final LetterNewsLetterProperty letterNewsLetterProperty;
 
     @Override
+    @Transactional
     public void fetchPDFFromWeb() throws IOException {
 
         createDirectory(DESTINATION, letterNewsLetterProperty.getRootLocation());
         String fullDestination = appendDestinationToRoot(DESTINATION, letterNewsLetterProperty.getRootLocation());
 
-        HttpGet request = new HttpGet(fetchUrlToNewsLetterAddress(URL_NEWSLETTER_GROSZEK));
+        NewsletterFromWebDTO newsletterFromWebDTO = fetchNewsletterDataFromWeb(firefoxDriver, URL_NEWSLETTER_GROSZEK);
+        HttpGet request = new HttpGet(newsletterFromWebDTO.getUrlToDownload());
         HttpResponse httpResponse = httpClient.execute(request);
         HttpEntity httpEntity = httpResponse.getEntity();
 
-        //todo search pdf newsLetter fileName in next TASK
         String fileName = generateFileName();
-        File pdfFile = new File(fullDestination + "/" + "pdfFile.pdf");
+        File pdfFile = new File(fullDestination + "/" + fileName);
         FileOutputStream fileOutputStream = new FileOutputStream(pdfFile);
 
         if (httpEntity != null) {
             try {
                 httpEntity.writeTo(fileOutputStream);
             } catch (IOException e) {
-                log.error("Error in fetch newsletter Eleclerc");
+                log.error("Error in fetch newsletter Groszek");
             }
         }
         fileOutputStream.close();
-        createAndSaveEntityPdfFile(pdfFile);
+        createAndSaveEntityPdfFile(pdfFile, fileName, newsletterFromWebDTO);
     }
 
-    @Override
-    public String fetchUrlToNewsLetterAddress(String urlNewsLetter) {
+    private void createAndSaveEntityPdfFile(File pdfFile, String fileName, NewsletterFromWebDTO newsletterFromWebDTO) {
 
-        try {
-            firefoxDriver.navigate().to(URL_NEWSLETTER_GROSZEK);
-            firefoxDriver.findElement(By.cssSelector(".newspapper-btn")).click();
-        } catch (Exception e) {
-            String description = this.getClass() + "No find elements with newsletter";
-            throw new NewsletterFetchProcessException(description);
-        }
+        LocalDate[] datesStartAndEnd = getDateRange(newsletterFromWebDTO.getDate());
 
-        //todo fetch URL from website
-        return TEST_URL;
-    }
-
-    private void createAndSaveEntityPdfFile(File pdfFile) {
         NewsletterFile newsletterFile = NewsletterFile.builder()
-                .fileName("fileName")
-                .path(pdfFile.getPath())
+                .fileName(fileName)
                 .shopName(ShopEnum.GROSZEK)
+                .path(pdfFile.getPath())
+                .createdDate(LocalDate.now())
+                .starDate(datesStartAndEnd[0])
+                .endDate(datesStartAndEnd[1])
                 .extension("pdf")
                 .build();
 
