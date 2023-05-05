@@ -55,6 +55,8 @@ public class LetterNewsletterService {
                 .shopName(newsletterFile.getShopName())
                 .extension("pdf")
                 .fileName(newsletterFile.getFileName())
+                .startDate(String.valueOf(newsletterFile.getStarDate()))
+                .endDate(String.valueOf(newsletterFile.getEndDate()))
                 .build();
     }
 

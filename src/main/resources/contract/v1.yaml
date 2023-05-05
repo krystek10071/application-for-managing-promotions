@@ -184,6 +184,10 @@ components:
           type: string
         extension:
           type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
 
     LetterNewsletterFileDTO:
       type: object
