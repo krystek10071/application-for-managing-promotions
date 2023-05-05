@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.managingPromotions.api.model.LetterNewsletterFileDTO;
 import pl.managingPromotions.api.model.LetterNewsletterResponseDTO;
-import pl.managingPromotions.api.model.ShopEnum;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -54,9 +53,10 @@ public class LetterNewsletterService {
         return LetterNewsletterResponseDTO.builder()
                 .id(newsletterFile.getId())
                 .shopName(newsletterFile.getShopName())
-                .shopName(ShopEnum.ELECLERC)
                 .extension("pdf")
                 .fileName(newsletterFile.getFileName())
+                .startDate(String.valueOf(newsletterFile.getStarDate()))
+                .endDate(String.valueOf(newsletterFile.getEndDate()))
                 .build();
     }
 

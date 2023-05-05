@@ -122,4 +122,14 @@
                  splitStatements="true"
                  stripComments="true"/>
     </changeSet>
+
+    <changeSet id="newsletter_file_add_column_start_date_and_end_date" author="krystian">
+        <sqlFile dbms="postgresql"
+                 encoding="utf8"
+                 endDelimiter=";"
+                 path="newsletter_file_add_column_start_date_and_end_date.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
 </databaseChangeLog>

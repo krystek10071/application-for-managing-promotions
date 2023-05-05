@@ -184,6 +184,10 @@ components:
           type: string
         extension:
           type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
 
     LetterNewsletterFileDTO:
       type: object
@@ -227,3 +231,11 @@ components:
           type: array
           items:
             type: string
+
+    NewsletterFromWebDTO:
+         type: object
+         properties:
+           urlToDownload:
+             type: string
+           date:
+             type: string

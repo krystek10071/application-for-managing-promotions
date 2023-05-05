@@ -49,4 +49,10 @@ public class NewsletterFile {
     @Enumerated(EnumType.STRING)
     @Column(name = "shop_name")
     private ShopEnum shopName;
+
+    @Column(name = "start_date")
+    private LocalDate starDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 }
