@@ -1,0 +1,2 @@
+ALTER TABLE grocery_list ALTER COLUMN create_date TYPE TIMESTAMP;
+ALTER TABLE grocery_list ALTER COLUMN modify_date TYPE TIMESTAMP;

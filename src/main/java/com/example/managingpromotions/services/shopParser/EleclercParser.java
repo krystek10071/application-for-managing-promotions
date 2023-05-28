@@ -1,5 +1,6 @@
 package com.example.managingpromotions.services.shopParser;
 
+import com.example.managingpromotions.util.StringUtils;
 import lombok.AllArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,8 +21,8 @@ import java.util.List;
 @Service("eleclercParser")
 public class EleclercParser implements IParser {
 
-    private static final String URL_SHOP_PREFIX = "https://leclercdrive.lublin.pl/szukaj?controller=search&orderby=position&orderway=desc&search_query=";
-    private static final String URL_SHOP_POSTFIX = "&submit_search=";
+    private static final String URL_SHOP_PREFIX = "https://leclercdrive.lublin.pl/szukaj?word=";
+    private static final String URL_SHOP_POSTFIX = "&search_box_btn_submit=";
 
     @Qualifier("edgeDriver")
     private final WebDriver edgeDriver;
@@ -37,7 +38,7 @@ public class EleclercParser implements IParser {
         List<ProductDTO> listProductDTO = new ArrayList<>();
 
         if (document != null) {
-            Elements elementsPromotionsFromShop = document.select("ul.product_list > li");
+            Elements elementsPromotionsFromShop = document.select("div.l-listing > div.product-listing");
 
             for (var row : elementsPromotionsFromShop) {
                 ProductDTO product = new ProductDTO();
@@ -53,7 +54,8 @@ public class EleclercParser implements IParser {
     }
 
     private String findProductDescription(Element row) {
-        return row.select("a.product-name").text();
+        String productDescription = row.select("div.product-listing-name").text();
+        return StringUtils.shortenString(productDescription);
     }
 
     private Document fetchDataByWebDriver(String eleclercProductUrl) {
@@ -62,7 +64,7 @@ public class EleclercParser implements IParser {
     }
 
     private String findPriceProduct(Element row) {
-        String price = row.select("span.price").text();
+        String price = row.select("span.product-listing-prices__price").text();
 
         return Arrays.stream(price.split(" "))
                 .findFirst()
@@ -71,6 +73,7 @@ public class EleclercParser implements IParser {
     }
 
     private String findProductNameInDocument(Element row) {
-        return row.select("a.product-name").text();
+        String productName = row.select("div.product-listing-name").text();
+        return StringUtils.shortenString(productName);
     }
 }

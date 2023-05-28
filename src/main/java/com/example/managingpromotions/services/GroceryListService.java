@@ -17,7 +17,7 @@ import pl.managingPromotions.api.model.GroceryListModifyRequestDTO;
 import pl.managingPromotions.api.model.GroceryListRequestDTO;
 import pl.managingPromotions.api.model.GroceryListResponseDTO;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +38,7 @@ public class GroceryListService {
         final GroceryList groceryList = groceryListMapper.mapGroceryListRequestDTOToGroceryList(groceryListRequestDTO);
 
         groceryList.setUserApp(user.orElseThrow(() -> new UserNotFoundException(groceryListRequestDTO.getUserLogin())));
-        groceryList.setCreateDate(LocalDate.now());
+        groceryList.setCreateDate(LocalDateTime.now());
 
         assignGroceryElementToGroceryList(groceryList);
         final GroceryList savedGroceryList = groceryListRepository.saveAndFlush(groceryList);
@@ -61,7 +61,7 @@ public class GroceryListService {
         final GroceryList savedGroceryList = groceryList.orElseThrow();
 
         savedGroceryList.setName(groceryListProductDTOS.getName());
-        savedGroceryList.setModifyDate(LocalDate.now());
+        savedGroceryList.setModifyDate(LocalDateTime.now());
         savedGroceryList.setGroceryElements(groceryListMapper.mapListGroceryListProductDTOToListGroceryElement(
                 groceryListProductDTOS.getProducts()));
 
