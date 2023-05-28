@@ -35,14 +35,12 @@ public class GroceryListService {
     @Transactional
     public CreateIdResponse createGroceryList(GroceryListRequestDTO groceryListRequestDTO) {
         Optional<UserApp> user = userRepository.findByUsername(groceryListRequestDTO.getUserLogin());
-
         final GroceryList groceryList = groceryListMapper.mapGroceryListRequestDTOToGroceryList(groceryListRequestDTO);
 
         groceryList.setUserApp(user.orElseThrow(() -> new UserNotFoundException(groceryListRequestDTO.getUserLogin())));
         groceryList.setCreateDate(LocalDate.now());
 
         assignGroceryElementToGroceryList(groceryList);
-
         final GroceryList savedGroceryList = groceryListRepository.saveAndFlush(groceryList);
 
         shopService.parseProductsFromShops(savedGroceryList.getId());

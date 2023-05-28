@@ -26,7 +26,6 @@ public class SeleniumConfig {
         System.setProperty("webdriver.gecko.driver", "src/main/resources/webdriver/geckodriver.exe");
 
         FirefoxProfile firefoxProfile = new FirefoxProfile();
-
         firefoxProfile.setPreference("browser.download.folderList", 2);
         firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk",
                 "text/csv,application/java-archive, application/x-msexcel,application/excel," +
@@ -36,7 +35,6 @@ public class SeleniumConfig {
 
         firefoxProfile.setPreference("pdfjs.disabled", true);
         firefoxProfile.setPreference("browser.download.dir", FILE_DOWNLOAD_LOCATION);
-        // Use this to disable Acrobat plugin for previewing PDFs in Firefox (if you have Adobe reader installed on your computer)
         firefoxProfile.setPreference("plugin.scan.Acrobat", "99.0");
         firefoxProfile.setPreference("plugin.scan.plid.all", false);
 

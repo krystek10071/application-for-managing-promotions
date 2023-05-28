@@ -39,17 +39,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.userRepository = userRepository;
     }
 
-    @Bean
-    public JsonObjectAuthenticationFilter authenticationFilter() throws Exception {
-
-        JsonObjectAuthenticationFilter filter = new JsonObjectAuthenticationFilter();
-        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-        filter.setAuthenticationFailureHandler(authenticationFailureHandler);
-        filter.setAuthenticationManager(super.authenticationManager());
-
-        return filter;
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
@@ -88,5 +77,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder builder) {
         builder.authenticationProvider(authenticationProvider());
+    }
+
+    @Bean
+    public JsonObjectAuthenticationFilter authenticationFilter() throws Exception {
+
+        JsonObjectAuthenticationFilter filter = new JsonObjectAuthenticationFilter();
+        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+        filter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        filter.setAuthenticationManager(super.authenticationManager());
+
+        return filter;
     }
 }

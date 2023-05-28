@@ -68,7 +68,6 @@ public class ShopService {
 
     @Transactional
     private void invokeProductsParsers(Set<GroceryElement> syncGroceryElements, GroceryList groceryList) {
-
         Thread threadProductParser = new Thread(() -> {
             synchronized (syncGroceryElements) {
                 syncGroceryElements.forEach(groceryElement -> {
@@ -80,7 +79,6 @@ public class ShopService {
                     groceryElement.addAllProducts(productsFromGroszek);
                 });
             }
-
             groceryList.setIsProcessed(true);
             groceryListRepository.save(groceryList);
         });

@@ -51,7 +51,6 @@ public class AccountService {
         return userRepository.findByUsername(credentials.getUsername()).isPresent();
     }
 
-
     private void credentialsValidation(RegistrationCredentials credentials) {
 
         if (!credentials.getPassword().equals(credentials.getPasswordConfirmation())) {
