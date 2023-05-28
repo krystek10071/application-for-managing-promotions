@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 public class ApiLogger {
 
-    public void logRequest(JsonRequestWrapper requestWrapper, String correlationId) {
+    public void logRequest(JsonRequestWrapper requestWrapper) {
         Map<String, String> headers = new HashMap<>();
         var headerNames = requestWrapper.getHeaderNames();
         while (headerNames.hasMoreElements()) {

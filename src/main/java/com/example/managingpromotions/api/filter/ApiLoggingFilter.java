@@ -55,7 +55,7 @@ public class ApiLoggingFilter implements Filter {
         apiStore.setCorrelationId(correlationId);
         MDC.put(REQUEST_UUID_KEY, correlationId);
         response.addHeader(REQUEST_UUID_KEY, correlationId);
-        apiLogger.logRequest(requestWrapper, correlationId);
+        apiLogger.logRequest(requestWrapper);
 
         var stopWatch = new StopWatch();
 

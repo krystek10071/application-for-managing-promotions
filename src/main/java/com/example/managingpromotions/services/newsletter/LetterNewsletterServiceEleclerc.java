@@ -36,7 +36,6 @@ public class LetterNewsletterServiceEleclerc extends LetterNewsLetterAbstract im
     @Override
     @Transactional
     public void fetchPDFFromWeb() throws IOException {
-
         createDirectory(DESTINATION, letterNewsLetterProperty.getRootLocation());
         String fullDestination = appendDestinationToRoot(DESTINATION, letterNewsLetterProperty.getRootLocation());
 

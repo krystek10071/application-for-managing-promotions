@@ -37,10 +37,9 @@ public class EleclercParser implements IParser {
         List<ProductDTO> listProductDTO = new ArrayList<>();
 
         if (document != null) {
-            //display document
-            Elements elementsPromotionsFromAuchan = document.select("ul.product_list > li");
+            Elements elementsPromotionsFromShop = document.select("ul.product_list > li");
 
-            for (var row : elementsPromotionsFromAuchan) {
+            for (var row : elementsPromotionsFromShop) {
                 ProductDTO product = new ProductDTO();
 
                 product.setProductName(findProductNameInDocument(row));
@@ -58,7 +57,6 @@ public class EleclercParser implements IParser {
     }
 
     private Document fetchDataByWebDriver(String eleclercProductUrl) {
-        // WebDriver webDriver = new ChromeDriver();
         edgeDriver.get(eleclercProductUrl);
         return Jsoup.parse(edgeDriver.getPageSource());
     }
@@ -68,7 +66,7 @@ public class EleclercParser implements IParser {
 
         return Arrays.stream(price.split(" "))
                 .findFirst()
-                .get()
+                .orElse("")
                 .replace(",", ".");
     }
 

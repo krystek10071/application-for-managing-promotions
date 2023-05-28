@@ -7,6 +7,5 @@ import java.util.List;
 
 public interface IParser {
     Document fetchDataFromWeb(String URL);
-
     List<ProductDTO> prepareData(Document document);
 }
